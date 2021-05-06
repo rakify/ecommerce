@@ -125,6 +125,21 @@ router.post('/edit-page/:slug', async (req, res) => {
     };
 });
 
+/*
+ * GET delete page
+ */
+router.get('/delete-page/:id', async(req, res) => {
+    try{
+    await Page.findOneAndDelete({_id:req.params.id})
+    req.flash('success','Page deleted!');
+    res.redirect('/admin/pages/');
+    } catch(err){
+        req.flash('danger', 'Deletion failed.');
+        res.redirect('/admin/pages/');
+    }
+});
+
+
 
 //exports
 module.exports = router;
