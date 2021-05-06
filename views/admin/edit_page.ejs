@@ -4,7 +4,7 @@
 <a href = '/admin/pages' class = 'btn btn-primary'>Back to all pages</a>
 <br><br>
 
-<form method = 'post' action = '/admin/pages/edit-page/<%= page.slug %>'>
+<form method = 'post' action = '/admin/pages/edit-page/<%= page._id %>'>
 
     <div class = 'mb-3'>
         <label for = '' class = 'form-level'>Sorting</label>
@@ -25,8 +25,6 @@
         <label for = '' class = 'form-level'>Content</label>
         <textarea name="content" class='form-control' id="ck" cols="10" rows="4" placeholder="Content"><%= page.content %></textarea>
     </div>
-
-    <input type="hidden" name="id" value="<%= page.id %>">
 
     <button class = 'btn btn-outline-secondary' type='submit'>Submit</button>
 </form>

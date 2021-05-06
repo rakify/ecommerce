@@ -12,14 +12,20 @@ const Page = require('../models/Page');
 /*
  * GET page index
  */
-router.get('/', (req, res) => {
-    Page.find({}).sort({
-        sorting: 1
-    }).exec((err, pages) => {
-        res.render('admin/pages', {
-            pages: pages
+router.get('/', async (req, res) => {
+    try {
+        await Page.find({}).sort({
+            sorting: 1
+        }).exec((err, pages) => {
+            res.render('admin/pages', {
+                pages: pages
+            });
         });
-    });
+    } catch (err) {
+        res.render('admin/pages', {
+            error: err
+        })
+    }
 });
 
 /*
@@ -76,51 +82,58 @@ router.post('/add-page', async (req, res) => {
 /*
  * GET edit page
  */
-router.get('/edit-page/:slug', async (req, res) => {
-    await Page.findOne({
-        slug: req.params.slug
-    }, (err, page) => {
-        if (err) return console.log(err);
-        res.render('admin/edit_page', {
-            page: page
+router.get('/edit-page/:id', async (req, res) => {
+    try {
+        await Page.findOne({
+            _id: req.params.id
+        }, (err, page) => {
+            res.render('admin/edit_page', {
+                page: page
+            });
+        })
+    } catch (err) {
+        res.render('admin/edit_pages', {
+            error: err
         });
-    })
+    };
 });
 
 /*
  * POST edit page
  */
-router.post('/edit-page/:slug', async (req, res) => {
+router.post('/edit-page/:id', async (req, res) => {
     let title = req.body.title;
     let slug = req.body.slug.replace(/\s+/g, '-').toLowerCase(); //all spaces replace with -
     if (slug === '') slug = title.replace(/\s+/g, '-').toLowerCase(); //if slug is empty replace it with title
     let content = req.body.content;
     let sorting = req.body.sorting;
-    let id = req.body.id;
+    let id = req.params.id;
     const page = {
         title: title,
         slug: slug,
         content: content,
         sorting: sorting,
-        id: id
+        _id:id
     }
     const {
         error
     } = pageValidation(page);
-    if (error){
+    if (error) {
         return res.render('admin/edit_page', {
-        error: error.details[0].message,
-        page:page
-    });
-}
+            error: error.details[0].message,
+            page: page
+        });
+    }
     try {
-        await Page.findOneAndUpdate({_id:id},page)
+        await Page.findOneAndUpdate({
+            _id: id
+        }, page)
         req.flash('success', 'Page Updated.');
-        res.redirect(`/admin/pages/edit-page/${slug}`);
+        res.redirect(`/admin/pages/edit-page/${id}`);
     } catch (err) {
-        req.flash('danger', 'Page slug exists, choose another.');   
+        req.flash('danger', 'Page slug exists, choose another.');
         res.render('admin/edit_page', {
-            page:page
+            page: page
         });
     };
 });
@@ -128,12 +141,14 @@ router.post('/edit-page/:slug', async (req, res) => {
 /*
  * GET delete page
  */
-router.get('/delete-page/:id', async(req, res) => {
-    try{
-    await Page.findOneAndDelete({_id:req.params.id})
-    req.flash('success','Page deleted!');
-    res.redirect('/admin/pages/');
-    } catch(err){
+router.get('/delete-page/:id', async (req, res) => {
+    try {
+        await Page.findOneAndDelete({
+            _id: req.params.id
+        })
+        req.flash('success', 'Page deleted.');
+        res.redirect('/admin/pages/');
+    } catch (err) {
         req.flash('danger', 'Deletion failed.');
         res.redirect('/admin/pages/');
     }

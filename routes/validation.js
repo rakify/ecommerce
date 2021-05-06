@@ -1,3 +1,4 @@
+const { string } = require('joi');
 const Joi = require('joi');
 
 
@@ -12,23 +13,18 @@ const pageValidation = (data) => {
             .min(5)
             .required(),
         sorting: Joi.number(),
-        id: Joi.string()
-            .allow("")
+        _id: Joi.string()
     });
     return schema.validate(data);
 }
 
 const categoryValidation = (data) => {
     const schema = Joi.object({
-        username: Joi.string()
+        title: Joi.string()
             .min(3).
         required(),
-        email: Joi.string()
-            .email()
-            .allow(""),
-        password: Joi.string()
-            .min(3)
-            .required()
+        slug: Joi.string(),
+        _id: Joi.string()
     });
     return schema.validate(data);
 }
