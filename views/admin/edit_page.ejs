@@ -1,0 +1,36 @@
+<%- include('../_layouts/adminheader') %>
+
+<h2 class = 'page-title'>Edit a page</h2>
+<a href = '/admin/pages' class = 'btn btn-primary'>Back to all pages</a>
+<br><br>
+
+<form method = 'post' action = '/admin/pages/edit-page/<%= page.slug %>'>
+
+    <div class = 'mb-3'>
+        <label for = '' class = 'form-level'>Sorting</label>
+        <input type = 'number' class='form-control form-control-sm' name = 'sorting' value = '<%= page.sorting %>' placeholder = '1'>
+    </div>
+
+    <div class = 'mb-3'>
+        <label for = '' class = 'form-level'>Title</label>
+        <input type = 'text' class='form-control' name = 'title' value = '<%= page.title %>' placeholder = 'Title'>
+    </div>
+
+    <div class = 'mb-3'>
+        <label for = '' class = 'form-level'>Slug</label>
+        <input type = 'text' class='form-control form-control-sm' name = 'slug' value = '<%= page.slug %>' placeholder = 'Slug'>
+    </div>
+
+    <div class = 'mb-3'>
+        <label for = '' class = 'form-level'>Content</label>
+        <textarea name="content" class='form-control' rows="4" placeholder="Content"><%= page.content %></textarea>
+    </div>
+
+    <input type="hidden" name="id" value="<%= page.id %>">
+
+    <button class = 'btn btn-outline-secondary' type='submit'>Submit</button>
+</form>
+
+
+
+<%- include('../_layouts/adminfooter') %>
