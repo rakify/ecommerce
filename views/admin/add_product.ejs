@@ -1,0 +1,72 @@
+<%- include('../_layouts/adminheader') %>
+
+<h2 class='page-title'>Add a product</h2>
+<a href='/admin/products' class='btn btn-primary'>Back to all products</a>
+<br><br>
+<form method='post' action='/admin/products/add-product' enctype="multipart/form-data">
+
+    <div class='mb-3'>
+        <label for='' class='form-level'>Title</label>
+        <input type='text' class='form-control' name='title' value='<%= title %>' placeholder='Title'>
+    </div>
+
+    <div class='mb-3'>
+        <label for='' class='form-level'>Description</label>
+        <textarea name="description" class='form-control' cols='30' rows="10"
+            placeholder="Description"><%= description %></textarea>
+    </div>
+
+    <div class='mb-3'>
+        <label for='' class='form-level'>Category</label>
+        <select name="category" class="form-select">
+            <% categories.forEach((category)=> { %>
+            <option value="<%= category.slug %>"><%= category.title %></option>
+            <% }) %>
+        </select>
+    </div>
+
+    <div class='mb-3'>
+        <label for='' class='form-level'>Price</label>
+        <input type='number' min='1' class='form-control' name='price' value='<%= price %>' placeholder='৳'>
+    </div>
+
+    <div class='mb-3'>
+        <label for='' class='form-level'>Image</label>
+        <input type='file' class='form-control' name='product_images' id="imgInput" accept="image/*"
+            onchange="previewImage();">
+        <img src="#" id='imgPreview' alt="">
+    </div>
+
+
+    <button class='btn btn-outline-secondary' type='submit'>Submit</button>
+</form>
+
+<script>
+    previewImage = () => {
+        let file = document.querySelector("#imgInput").files;
+        if (file.length > 0) {
+            let reader = new FileReader();
+            reader.onload = (event) => {
+                document.querySelector("#imgPreview").setAttribute("src", event.target.result);
+            };
+            reader.readAsDataURL(file[0]);
+        }
+    }
+    //     <input type='file' accept='image/*' onchange='openFile(event)'><br>
+    // <img id='output'>
+
+    // script
+    // var openFile = function(event) {
+    //     var input = event.target;
+
+    //     var reader = new FileReader();
+    //     reader.onload = function(){
+    //       var dataURL = reader.result;
+    //       var output = document.getElementById('output');
+    //       output.src = dataURL;
+    //     };
+    //     reader.readAsDataURL(input.files[0]);
+    //   };
+</script>
+
+<%- include('../_layouts/adminfooter') %>

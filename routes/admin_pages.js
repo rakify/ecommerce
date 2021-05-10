@@ -92,7 +92,7 @@ router.get('/edit-page/:id', async (req, res) => {
             });
         })
     } catch (err) {
-        res.render('admin/edit_pages', {
+        res.render('admin/edit_page', {
             error: err
         });
     };

@@ -1,0 +1,50 @@
+<%- include('../_layouts/adminheader') %>
+
+<h2 class = 'page-title'>Edit a product</h2>
+<a href = '/admin/products' class = 'btn btn-primary'>Back to all products</a>
+<br><br>
+
+<form method = 'post' action = '/admin/products/edit-product/<%= product._id %>' enctype="multipart/form-data">
+
+    <div class = 'mb-3'>
+        <label for = '' class = 'form-level'>Title</label>
+        <input type = 'text' class='form-control' name = 'title' value = '<%= product.title %>' placeholder = 'Title'>
+    </div>
+
+    <div class = 'mb-3'>
+        <label for = '' class = 'form-level'>Description</label>
+        <textarea name="description" class='form-control' cols="10" rows="4" placeholder="Description"><%= product.description %></textarea>
+    </div>
+
+    <div class='mb-3'>
+        <label for='' class='form-level'>Price</label>
+        <input type='number' min='1' class='form-control' name='price' value='<%= product.price %>' placeholder='৳'>
+    </div>
+
+    <input type='hidden' name="category" value="<%= product.category %>">
+    <input type='hidden' name="image" value="<%= product.image %>">
+    
+    <div class='mb-3'>
+        <label for='' class='form-level'>Current Image: </label>
+        <img src ='/images/product_images/<%= product._id %>/<%= product.image %>' width="100" height="100">
+        <input type='file' class='form-control' name='product_images' id="imgInput" accept="image/*"
+            onchange="previewImage();">
+        <img src="#" id='imgPreview' alt="">
+    </div>
+    <button class='btn btn-outline-secondary' type='submit'>Submit</button>
+</form>
+
+<script>
+    previewImage = () => {
+        let file = document.querySelector("#imgInput").files;
+        if (file.length > 0) {
+            let reader = new FileReader();
+            reader.onload = (event) => {
+                document.querySelector("#imgPreview").setAttribute("src", event.target.result);
+            };
+            reader.readAsDataURL(file[0]);
+        }
+    }
+</script>
+
+<%- include('../_layouts/adminfooter') %>

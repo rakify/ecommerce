@@ -1,0 +1,44 @@
+<%- include('../_layouts/adminheader') %>
+
+<h2 class='page-title'>Products</h2>
+<a href='/admin/products/add-product' class='btn btn-primary'>Add a new product</a>
+<br><br>
+
+<% if (count>0) { %>
+<table class='table table-striped'>
+    <thead class='thead-light'>
+        <tr class='home'>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Product Image</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% products.forEach((product)=> { %>
+        <tr>
+            <td><%= product.title %></td>
+            <td>৳<%= product.price%></td>
+            <td><%= product.category %></td>
+            <td>
+                <% if (product.image === '') { %>
+                <img src ='/images/noimage.png' width="100" height="100">   
+                <% } else { %>
+                    <img src ='/images/product_images/<%= product._id %>/<%= product.image %>' width="100" height="100">
+                    <% } %>
+            </td>
+            <td><a href="/admin/products/edit-product/<%= product._id %>">Edit</a></td>
+            <td><a href="/admin/products/delete-product/<%= product._id %>" onclick="return confirm('Are you sure?')">Delete</a></td>
+        </tr>
+        <% }); %>
+    </tbody>
+</table>    
+<% } else { %>
+    <h3 class = 'text-center'> No products available.</h3>
+<% } %>
+
+
+
+<%- include('../_layouts/adminfooter') %>

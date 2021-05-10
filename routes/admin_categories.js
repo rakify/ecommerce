@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
             res.render('admin/categories', {
                 categories: categories
             });
-        });
+        })
     } catch (err) {
         res.render('admin/categories', {
             error: err
