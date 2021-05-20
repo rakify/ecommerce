@@ -25,8 +25,9 @@ const ProductSchema = mongoose.Schema({
         type: Number,
         require: true
     },
-    image: {
-        type: String,
+    images: {
+        type: Array,
+        max: 5,
         required: true
     }
 }, {

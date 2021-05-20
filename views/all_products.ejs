@@ -1,0 +1,17 @@
+<%- include('_layouts/header') %>
+
+<div class="row products">
+    <% products.forEach((product)=>{ %>
+    <div class="col-xs-12 col-md-4">
+        <a class="pa" href="/products/<%= product.category %>/<%= product.slug %>">
+            <img class="pimage" src="/images/product_images/<%= product._id %>/<%= product.images[0] %>" alt="">
+        </a>
+        <h3><%= product.title %></h3>
+        <h4>৳<%= product.price %></h4>
+        <a class="vd" href="/products/<%= product.category %>/<%= product.slug %>">View Details</a>
+    </div>
+    <% }) %>
+
+</div>
+
+<%- include('_layouts/footer') %>

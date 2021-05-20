@@ -48,9 +48,10 @@ const productValidation = (data) => {
         price: Joi.number()
             .min(1)
             .required(),
-        image: Joi.string()
-            .required(),
-        _id: Joi.string()    
+        images: Joi.array()
+            .max(5)
+            .allow(''),
+        _id: Joi.string()
     });
     return schema.validate(data);
 }

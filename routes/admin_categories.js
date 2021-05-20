@@ -13,17 +13,18 @@ const Category = require('../models/Category');
  * GET category index
  */
 router.get('/', async (req, res) => {
-    try {
-        await Category.find((err, categories) => {
+    await Category.find((err, categories) => {
+        if (err) {
+            res.render('admin/categories', {
+                error: err
+            });
+        }
+        if (categories) {
             res.render('admin/categories', {
                 categories: categories
             });
-        })
-    } catch (err) {
-        res.render('admin/categories', {
-            error: err
-        });
-    };
+        }
+    });
 });
 
 /*
@@ -50,40 +51,43 @@ router.post('/add-category', async (req, res) => {
         title: title
     });
 
-    try {
-        await Category.create({
-            title: title,
-            slug: slug
-        });
-
-        req.flash('success', 'Category added');
-        res.redirect('/admin/categories');
-
-    } catch (err) {
-        req.flash('danger', 'Category title exists, choose another.')
-        res.render('admin/add_category', {
-            title: title
-        });
-    };
+    Category.create({
+        title: title,
+        slug: slug
+    }, (err, category) => {
+        if (err) {
+            req.flash('danger', 'Category title exists, choose another.')
+            res.render('admin/add_category', {
+                title: title
+            });
+        }
+        if (category) {
+            Category.find((err, categories) => {
+                if (err) console.log(err);
+                if (categories) req.app.locals.categories = categories;
+            });
+            req.flash('success', 'Category added');
+            res.redirect('/admin/categories');
+        }
+    });
 });
 
 /*
  * GET edit category
  */
 router.get('/edit-category/:id', async (req, res) => {
-    try {
-        await Category.findOne({
-            _id: req.params.id
-        }, (err, category) => {
+    await Category.findById(req.params.id, (err, category) => {
+        if (err) {
             res.render('admin/edit_category', {
                 category: category
             });
-        })
-    } catch (err) {
-        res.render('admin/edit_category', {
-            category: category
-        });
-    };
+        }
+        if (category) {
+            res.render('admin/edit_category', {
+                category: category
+            });
+        }
+    });
 });
 
 /*
@@ -96,7 +100,7 @@ router.post('/edit-category/:id', async (req, res) => {
     const category = {
         title: title,
         slug: slug,
-        _id:id
+        _id: id
     }
     const {
         error
@@ -107,34 +111,42 @@ router.post('/edit-category/:id', async (req, res) => {
             category: category
         });
     }
-    try {
-        await Category.findOneAndUpdate({
-            _id: id
-        }, category)
-        req.flash('success', 'Category updated.');
-        res.redirect(`/admin/categories/edit-category/${id}`);
-    } catch (err) {
-        req.flash('danger', 'Category exists, choose another.');
-        res.render('admin/edit_category', {
-            category: category
-        });
-    };
+    await Category.findByIdAndUpdate(id, category, (err, category) => {
+        if (err) {
+            req.flash('danger', 'Category exists, choose another.');
+            res.render('admin/edit_category', {
+                category: category
+            });
+        }
+        if (category) {
+            Category.find((err, categories) => {
+                if (err) console.log(err);
+                if (categories) req.app.locals.categories = categories;
+            });
+            req.flash('success', 'Category updated.');
+            res.redirect(`/admin/categories/edit-category/${id}`);
+        }
+    });
 });
 
 /*
  * GET delete category
  */
 router.get('/delete-category/:id', async (req, res) => {
-    try {
-        await Category.findOneAndDelete({
-            _id: req.params.id
-        })
-        req.flash('success', 'Category deleted.');
-        res.redirect('/admin/categories/');
-    } catch (err) {
-        req.flash('danger', 'Deletion failed.');
-        res.redirect('/admin/categories/');
-    }
+    await Category.findByIdAndRemove(req.params.id, (err, category) => {
+        if (err) {
+            req.flash('danger', 'Deletion failed.');
+            res.redirect('/admin/categories/');
+        }
+        if (category) {
+            Category.find((err, categories) => {
+                if (err) console.log(err);
+                if (categories) req.app.locals.categories = categories;
+            });
+            req.flash('success', 'Category deleted.');
+            res.redirect('/admin/categories/');
+        }
+    });
 });
 
 

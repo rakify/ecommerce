@@ -12,9 +12,9 @@ const Page = require('../models/Page');
 /*
  * GET page index
  */
-router.get('/', async (req, res) => {
+router.get('/', (_req, res) => {
     try {
-        await Page.find({}).sort({
+        Page.find({}).sort({
             sorting: 1
         }).exec((err, pages) => {
             res.render('admin/pages', {
@@ -57,45 +57,50 @@ router.post('/add-page', async (req, res) => {
         slug: slug,
         content: content
     });
-
-    try {
-        await Page.create({
-            title: title,
-            slug: slug,
-            content: content,
-            sorting: 100
-        });
-
-        req.flash('success', 'Page added');
-        res.redirect('/admin/pages');
-
-    } catch (err) {
-        req.flash('danger', 'Slug exists, choose another.')
-        res.render('admin/add_page', {
-            title: title,
-            slug: slug,
-            content: content
-        });
-    };
+    Page.create({
+        title: title,
+        slug: slug,
+        content: content,
+        sorting: 100
+    }, (err, page) => {
+        if (err) {
+            req.flash('danger', 'Slug exists, choose another.')
+            res.render('admin/add_page', {
+                title: title,
+                slug: slug,
+                content: content
+            });
+        }
+        if (page) {
+            Page.find({}).sort({
+                sorting: 1
+            }).exec((err, pages) => {
+                if (err) console.log(err);
+                if (pages) req.app.locals.pages = pages;
+            });
+            req.flash('success', 'Page added');
+            res.redirect('/admin/pages');
+        }
+    });
 });
 
 /*
  * GET edit page
  */
 router.get('/edit-page/:id', async (req, res) => {
-    try {
-        await Page.findOne({
-            _id: req.params.id
-        }, (err, page) => {
+    await Page.findById(req.params.id, (err, page) => {
+        if (err) {
+            res.render('admin/edit_page', {
+                error: err
+            });
+
+        }
+        if (page) {
             res.render('admin/edit_page', {
                 page: page
             });
-        })
-    } catch (err) {
-        res.render('admin/edit_page', {
-            error: err
-        });
-    };
+        }
+    });
 });
 
 /*
@@ -113,7 +118,7 @@ router.post('/edit-page/:id', async (req, res) => {
         slug: slug,
         content: content,
         sorting: sorting,
-        _id:id
+        _id: id
     }
     const {
         error
@@ -124,34 +129,46 @@ router.post('/edit-page/:id', async (req, res) => {
             page: page
         });
     }
-    try {
-        await Page.findOneAndUpdate({
-            _id: id
-        }, page)
-        req.flash('success', 'Page Updated.');
-        res.redirect(`/admin/pages/edit-page/${id}`);
-    } catch (err) {
-        req.flash('danger', 'Page slug exists, choose another.');
-        res.render('admin/edit_page', {
-            page: page
-        });
-    };
+    await Page.findByIdAndUpdate(id, page, (err, page) => {
+        if (err) {
+            req.flash('danger', 'Page slug exists, choose another.');
+            res.render('admin/edit_page', {
+                page: page
+            });
+        }
+        if (page) {
+            Page.find({}).sort({
+                sorting: 1
+            }).exec((err, pages) => {
+                if (err) console.log(err);
+                if (pages) req.app.locals.pages = pages;
+            });
+            req.flash('success', 'Page Updated.');
+            res.redirect(`/admin/pages/edit-page/${id}`);
+        }
+    });
 });
 
 /*
  * GET delete page
  */
 router.get('/delete-page/:id', async (req, res) => {
-    try {
-        await Page.findOneAndDelete({
-            _id: req.params.id
-        })
-        req.flash('success', 'Page deleted.');
-        res.redirect('/admin/pages/');
-    } catch (err) {
-        req.flash('danger', 'Deletion failed.');
-        res.redirect('/admin/pages/');
-    }
+    await Page.findByIdAndDelete(req.params.id, (err, page) => {
+        if (err) {
+            req.flash('danger', 'Deletion failed.');
+            res.redirect('/admin/pages/');
+        }
+        if (page) {
+            Page.find({}).sort({
+                sorting: 1
+            }).exec((err, pages) => {
+                if (err) console.log(err);
+                if (pages) req.app.locals.pages = pages;
+            });
+            req.flash('success', 'Page deleted.');
+            res.redirect('/admin/pages/');
+        }
+    })
 });
 
 

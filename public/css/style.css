@@ -1,0 +1,21 @@
+img.pimage {
+width: 150px;
+height: 150px;
+}
+img.spi {
+    width: 100%;
+}
+a.pa {
+    display: inline-block;
+    height: 160px;
+}
+.row .products .p {
+    background-color: aqua;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+ul.gallery li {
+    display: inline-block;
+    margin: 20px;
+    list-style: none;
+}

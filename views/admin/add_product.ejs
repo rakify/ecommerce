@@ -7,13 +7,13 @@
 
     <div class='mb-3'>
         <label for='' class='form-level'>Title</label>
-        <input type='text' class='form-control' name='title' value='<%= title %>' placeholder='Title'>
+        <input type='text' class='form-control' name='title' value='<%= product.title %>' placeholder='Title'>
     </div>
 
     <div class='mb-3'>
         <label for='' class='form-level'>Description</label>
         <textarea name="description" class='form-control' cols='30' rows="10"
-            placeholder="Description"><%= description %></textarea>
+            placeholder="Description"><%= product.description %></textarea>
     </div>
 
     <div class='mb-3'>
@@ -27,13 +27,13 @@
 
     <div class='mb-3'>
         <label for='' class='form-level'>Price</label>
-        <input type='number' min='1' class='form-control' name='price' value='<%= price %>' placeholder='৳'>
+        <input type='number' min='1' class='form-control' name='price' value='<%= product.price %>' placeholder='৳'>
     </div>
 
     <div class='mb-3'>
         <label for='' class='form-level'>Image</label>
-        <input type='file' class='form-control' name='product_images' id="imgInput" accept="image/*"
-            onchange="previewImage();">
+        <input type='file' class='form-control' name='images' id="imgInput" accept="image/*"
+            onchange="previewImage();" multiple>
         <img src="#" id='imgPreview' alt="">
     </div>
 
