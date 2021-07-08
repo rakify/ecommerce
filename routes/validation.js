@@ -56,6 +56,38 @@ const productValidation = (data) => {
     return schema.validate(data);
 }
 
+const registerValidation = (data) => {
+    const schema = Joi.object({
+        username: Joi.string()
+            .min(3).
+        required(),
+        email: Joi.string()
+            .email()
+            .allow(""),
+        password: Joi.string()
+            .min(3)
+            .required(),
+        password2: Joi.any().equal(Joi.ref('password'))
+            .required()
+            .options({ messages: { 'any.only': 'Passwords do not match'} })
+    });
+    return schema.validate(data);
+}
+
+const loginValidation = (data) => {
+    const schema = Joi.object({
+        username: Joi.string()
+            .min(3).
+        required(),
+        password: Joi.string()
+            .min(3)
+            .required()
+    });
+    return schema.validate(data);
+}
+
+module.exports.registerValidation = registerValidation;
+module.exports.loginValidation = loginValidation;
 module.exports.pageValidation = pageValidation;
 module.exports.productValidation = productValidation;
 module.exports.categoryValidation = categoryValidation;

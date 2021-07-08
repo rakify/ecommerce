@@ -1,7 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const passport = require('passport');
 require('dotenv').config();
+
 //connect to db
 mongoose.connect(process.env.DB_CONNECTION, {
   useNewUrlParser: true,
@@ -73,6 +75,18 @@ app.use((req, res, next)=> {
   next();
 });
 
+// Passport config
+require('./config/passport')(passport);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('*', (req,res,next)=>{
+  res.locals.cart = req.session.cart;
+  res.locals.user = req.user || null;
+  next();
+})
 
 
 
@@ -80,14 +94,18 @@ app.use((req, res, next)=> {
 //set routes
 let pages = require('./routes/pages');
 let products = require('./routes/products');
+let users = require('./routes/users');
 let adminPages = require('./routes/admin_pages');
 let adminCategories = require(`./routes/admin_categories`);
 let adminProducts = require('./routes/admin_products');
+let cart = require('./routes/cart');
 
 app.use('/admin/pages', adminPages);
 app.use('/admin/categories', adminCategories);
 app.use('/admin/products', adminProducts);
 app.use('/products', products);
+app.use('/cart', cart);
+app.use('/users', users);
 app.use('/', pages);
 
 
