@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../config/auth')
+const isAdmin = auth.isAdmin;
 
 //get categoryValidation
 const {
@@ -12,7 +14,7 @@ const Category = require('../models/Category');
 /*
  * GET category index
  */
-router.get('/', async (req, res) => {
+router.get('/', isAdmin, async (req, res) => {
     await Category.find((err, categories) => {
         if (err) {
             res.render('admin/categories', {
@@ -30,7 +32,7 @@ router.get('/', async (req, res) => {
 /*
  * GET add category
  */
-router.get('/add-category', (req, res) => {
+router.get('/add-category', isAdmin, (req, res) => {
     let title;
     res.render('admin/add_category', {
         title: title
@@ -75,7 +77,7 @@ router.post('/add-category', async (req, res) => {
 /*
  * GET edit category
  */
-router.get('/edit-category/:id', async (req, res) => {
+router.get('/edit-category/:id', isAdmin, async (req, res) => {
     await Category.findById(req.params.id, (err, category) => {
         if (err) {
             res.render('admin/edit_category', {
@@ -132,7 +134,7 @@ router.post('/edit-category/:id', async (req, res) => {
 /*
  * GET delete category
  */
-router.get('/delete-category/:id', async (req, res) => {
+router.get('/delete-category/:id', isAdmin, async (req, res) => {
     await Category.findByIdAndRemove(req.params.id, (err, category) => {
         if (err) {
             req.flash('danger', 'Deletion failed.');

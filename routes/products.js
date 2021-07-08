@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../config/auth')
+const isUser = auth.isUser;
 
 // Get Product Model
 let Product = require('../models/Product');

@@ -36,12 +36,12 @@
           <% if (page.slug == 'home') { %>
           <li> <a href="/" class="nav-link px-2 text-white"><%= page.title %></a></li>
           <% } else { %>
-          <li> <a href="<%= page.slug %>" class="nav-link px-2 text-white"><%= page.title %></a></li>
+          <li> <a href="/<%= page.slug %>" class="nav-link px-2 text-white"><%= page.title %></a></li>
           <% }}) %>
         </ul>
         <% if (user && user.admin==1) { %>
         <div class="text-end btn btn-outline-light me-2">
-          <a href="/users/logout">Logout</a> || <a href="admin/pages"> Admin Area</a>
+          <a href="/users/logout">Logout</a> || <a href="/admin/pages"> Admin Area</a>
         </div>
         <% } else if (user) { %>
         <div class="text-end btn btn-outline-light me-2">Hi, <%= user.username %>

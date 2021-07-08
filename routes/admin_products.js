@@ -3,6 +3,8 @@ const router = express.Router();
 const fs = require('fs-extra');
 const path = require('path');
 const multer = require('multer');
+const auth = require('../config/auth')
+const isAdmin = auth.isAdmin;
 
 //get productValidation
 const {
@@ -42,7 +44,7 @@ const imageUpload = multer({
 /*
  * GET products index
  */
-router.get('/', (_req, res) => {
+router.get('/', isAdmin, (_req, res) => {
     Product.find((_err, products) => { //if no product available rendered file will handle the err
         res.render('admin/products', {
             products: products,
@@ -54,7 +56,7 @@ router.get('/', (_req, res) => {
 /*
  * GET add product
  */
-router.get('/add-product', async (_req, res) => {
+router.get('/add-product', isAdmin, async (_req, res) => {
     let title, description, price;
     let newProduct = {
         title: title,
@@ -136,7 +138,7 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
 /*
  * GET edit product
  */
-router.get('/edit-product/:id', (req, res) => {
+router.get('/edit-product/:id', isAdmin, (req, res) => {
     Product.findById(req.params.id, (err, product) => {
         if (err) return res.sendStatus(404);
         res.render('admin/edit_product', {
@@ -206,7 +208,7 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
 /*
  * GET delete product
  */
-router.get('/delete-product/:id', async (req, res) => {
+router.get('/delete-product/:id', isAdmin, async (req, res) => {
     await Product.findByIdAndDelete(req.params.id, (err, product) => {
         if (err) {
             req.flash('danger', 'Deletion failed.');
@@ -225,7 +227,7 @@ router.get('/delete-product/:id', async (req, res) => {
 /*
  * GET delete image
  */
-router.get('/delete-image/:image', async (req, res) => {
+router.get('/delete-image/:image', isAdmin, async (req, res) => {
     let id = req.query.id,
         image = req.params.image;
     fs.remove(`public/images/product_images/${id}/${image}`, err => {

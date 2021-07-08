@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../config/auth')
+const isAdmin = auth.isAdmin;
 
 //get pageValidation
 const {
@@ -12,7 +14,7 @@ const Page = require('../models/Page');
 /*
  * GET page index
  */
-router.get('/', (_req, res) => {
+router.get('/', isAdmin, (_req, res) => {
     try {
         Page.find({}).sort({
             sorting: 1
@@ -31,7 +33,7 @@ router.get('/', (_req, res) => {
 /*
  * GET add page
  */
-router.get('/add-page', (req, res) => {
+router.get('/add-page', isAdmin, (req, res) => {
     let title, slug, content;
     res.render('admin/add_page', {
         title: title,
@@ -87,7 +89,7 @@ router.post('/add-page', async (req, res) => {
 /*
  * GET edit page
  */
-router.get('/edit-page/:id', async (req, res) => {
+router.get('/edit-page/:id', isAdmin, async (req, res) => {
     await Page.findById(req.params.id, (err, page) => {
         if (err) {
             res.render('admin/edit_page', {
@@ -152,7 +154,7 @@ router.post('/edit-page/:id', async (req, res) => {
 /*
  * GET delete page
  */
-router.get('/delete-page/:id', async (req, res) => {
+router.get('/delete-page/:id', isAdmin, async (req, res) => {
     await Page.findByIdAndDelete(req.params.id, (err, page) => {
         if (err) {
             req.flash('danger', 'Deletion failed.');
