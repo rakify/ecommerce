@@ -69,25 +69,50 @@ const registerValidation = (data) => {
             .required(),
         password2: Joi.any().equal(Joi.ref('password'))
             .required()
-            .options({ messages: { 'any.only': 'Passwords do not match'} })
+            .options({ messages: { 'any.only': 'Passwords do not match'} }),
+        fname: Joi.string()
+        .min(3)
+        .allow(""),
+        lname: Joi.string()
+        .min(3)
+        .allow(""),
+        pn: Joi.string()
+        .min(11)
+        .allow(""),
     });
     return schema.validate(data);
 }
 
-const loginValidation = (data) => {
+const updateValidation = (data) => {
     const schema = Joi.object({
         username: Joi.string()
-            .min(3).
-        required(),
+            .min(3)
+            .allow(""),
+        email: Joi.string()
+            .email()
+            .allow(""),
         password: Joi.string()
             .min(3)
-            .required()
+            .allow(''),
+        password2: Joi.any().equal(Joi.ref('password'))
+            .options({ messages: { 'any.only': 'Passwords do not match'} })
+            .allow(""),
+        fname: Joi.string()
+        .min(3)
+        .allow(""),
+        lname: Joi.string()
+        .min(3)
+        .allow(""),
+        pn: Joi.string()
+        .min(11)
+        .allow(""),
     });
     return schema.validate(data);
 }
 
+
+module.exports.updateValidation = updateValidation;
 module.exports.registerValidation = registerValidation;
-module.exports.loginValidation = loginValidation;
 module.exports.pageValidation = pageValidation;
 module.exports.productValidation = productValidation;
 module.exports.categoryValidation = categoryValidation;

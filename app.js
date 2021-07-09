@@ -92,6 +92,7 @@ app.get('*', (req,res,next)=>{
 
 
 //set routes
+let user = require('./routes/user');
 let pages = require('./routes/pages');
 let products = require('./routes/products');
 let users = require('./routes/users');
@@ -106,6 +107,7 @@ app.use('/admin/products', adminProducts);
 app.use('/products', products);
 app.use('/cart', cart);
 app.use('/users', users);
+app.use('/user', user);
 app.use('/', pages);
 
 

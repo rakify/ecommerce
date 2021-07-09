@@ -16,6 +16,15 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    fname: {
+        type: String
+    },
+    lname: {
+        type: String,
+    },
+    pn: {
+        type: String,
+    },
     admin: {
         type: Number
     }

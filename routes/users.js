@@ -4,8 +4,11 @@ const passport = require('passport');
 const bcrypt = require('bcryptjs');
 const {
     registerValidation,
-    loginValidation
+    updateValidation
 } = require('./validation');
+const auth = require('../config/auth')
+const isUser = auth.isUser;
+
 
 // Get User Model
 let User = require('../models/User');
@@ -37,10 +40,17 @@ router.post('/register', async (req, res) => {
         email = req.body.email,
         password = req.body.password,
         hash = await bcrypt.hash(password, 10);
+        fname = req.body.fname,
+        lname = req.body.lname,
+        pn = req.body.pn
+
     User.create({
         username: username,
         email: email,
         password: hash,
+        fname: fname,
+        lname: lname,
+        pn: pn,
         admin: 0
     }, (err, user) => {
         if (err) {

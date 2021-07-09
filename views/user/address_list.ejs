@@ -1,0 +1,8 @@
+<%- include('../_layouts/header') %>
+
+<h1 class="page-title"><%= title %></h1>
+<% if (user.address.length==0) { %>
+No address found.
+<% } %>
+<a href="#">Add a new address</a>
+<%- include('../_layouts/footer') %>
