@@ -69,16 +69,36 @@ const registerValidation = (data) => {
             .required(),
         password2: Joi.any().equal(Joi.ref('password'))
             .required()
-            .options({ messages: { 'any.only': 'Passwords do not match'} }),
+            .options({
+                messages: {
+                    'any.only': 'Passwords do not match'
+                }
+            }),
         fname: Joi.string()
-        .min(3)
-        .allow(""),
+            .min(3)
+            .allow(""),
         lname: Joi.string()
-        .min(3)
-        .allow(""),
+            .min(3)
+            .allow(""),
         pn: Joi.string()
-        .min(11)
-        .allow(""),
+            .min(11)
+            .allow(""),
+    });
+    return schema.validate(data);
+}
+
+const passwordValidation = (data) => {
+    const schema = Joi.object({
+        newPw: Joi.string()
+            .min(3)
+            .required(),
+        confirmNewPw: Joi.any().equal(Joi.ref('newPw'))
+            .options({
+                messages: {
+                    'any.only': 'Passwords do not match'
+                }
+            })
+            .required(),
     });
     return schema.validate(data);
 }
@@ -87,31 +107,47 @@ const updateValidation = (data) => {
     const schema = Joi.object({
         username: Joi.string()
             .min(3)
-            .allow(""),
+            .required(),
         email: Joi.string()
             .email()
-            .allow(""),
+            .allow(''),
         password: Joi.string()
             .min(3)
             .allow(''),
         password2: Joi.any().equal(Joi.ref('password'))
-            .options({ messages: { 'any.only': 'Passwords do not match'} })
+            .options({
+                messages: {
+                    'any.only': 'Passwords do not match'
+                }
+            })
             .allow(""),
         fname: Joi.string()
-        .min(3)
-        .allow(""),
+            .min(3)
+            .allow(""),
         lname: Joi.string()
-        .min(3)
-        .allow(""),
+            .min(3)
+            .allow(""),
         pn: Joi.string()
-        .min(11)
-        .allow(""),
+            .length(11)
+            .pattern(/^\d+$/) //d for only digits
+            .allow("")
+            .messages({
+                'string.length': 'Phone number must contain 11 digits',
+                'string.pattern.base': 'Phone number must contain only digits'
+            }),
+        division: Joi.string()
+            .allow(""),
+        district: Joi.string()
+            .allow(""),
+        address: Joi.string()
+            .allow(""),
     });
     return schema.validate(data);
 }
 
 
 module.exports.updateValidation = updateValidation;
+module.exports.passwordValidation = passwordValidation;
 module.exports.registerValidation = registerValidation;
 module.exports.pageValidation = pageValidation;
 module.exports.productValidation = productValidation;

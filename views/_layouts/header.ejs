@@ -72,21 +72,19 @@
       </div>
     </div>
   </header>
+  <div class="h5 card-title card-header">Categories</div>
+  <div class="card-body">
+    <a href="/products" class="card-link">All products</a>
+    <% categories.forEach((c)=>{ %>
+    <a href="/products/<%= c.slug %>" class="card-link"><%= c.title %></a>
+    <% }) %>
+  </div>
+
   <br>
 
   <div class='container'><%- messages('messages', locals) %>
     <% if (error) {%>
     <div class="alert alert-danger"><%= error %></div>
     <% }%>
-    <div class="row">
-      <div class="col-xs-12 col-md-3">
-        <h3>Categories</h3>
-        <ul class="list-group">
-          <li class="list-group-item list-group-item-action"><a href="/products">All products</a></li>
-          <% categories.forEach((c)=>{ %>
-          <li class="list-group-item list-group-item-action"><a href="/products/<%= c.slug %>"><%= c.title %></a></li>
-          <% }) %>
-        </ul>
-      </div>
-      <div class="col-xs-12 col-md-1"></div>
-      <div class="col-xs-12 col-md-8">
+    
+      

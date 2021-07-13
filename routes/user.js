@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const {
-    updateValidation
+    updateValidation,
+    passwordValidation
 } = require('./validation');
 const auth = require('../config/auth')
 const isUser = auth.isUser;
@@ -15,8 +16,9 @@ let User = require('../models/User');
 /*
  * GET profile
  */
-router.get('/profile', function (req, res) {
+router.get('/profile', isUser, (req, res) => {
     res.render('user/profile.ejs', {
+        user: req.user,
         title: 'Profile'
     });
 });
@@ -25,16 +27,8 @@ router.get('/profile', function (req, res) {
  * GET user details
  */
 router.get('/edit-profile', isUser, async (req, res) => {
-    let user = {
-        username: req.user.username,
-        email: req.user.email,
-        password: '',
-        fname: req.user.fname,
-        lname: req.user.lname,
-        pn: req.user.pn
-    }
     res.render('user/edit_profile.ejs', {
-        user: user,
+        user: req.user,
         title: 'Edit Profile'
     });
 });
@@ -44,31 +38,36 @@ router.get('/edit-profile', isUser, async (req, res) => {
  */
 router.post('/edit-profile', isUser, async (req, res) => {
     let username = (req.body.username) ? req.body.username : req.user.username,
-    email = (req.body.email) ? req.body.email : req.user.email,
-    password = (req.body.password) ? req.body.password : req.user.password,
-    fname = (req.body.fname) ? req.body.fname : req.user.fname,
-    lname = (req.body.lname) ? req.body.lname : req.user.lname,
-    pn = (req.body.pn) ? req.body.pn : req.user.pn,
-    hash;
+        email = (req.body.email) ? req.body.email : req.user.email,
+        password = (req.body.password) ? req.body.password : req.user.password,
+        fname = req.body.fname,
+        lname = req.body.lname,
+        pn = req.body.pn,
+        address = {
+            division: (req.body.division) ? req.body.division : req.user.address.division,
+            district: (req.body.district) ? req.body.district : req.user.address.district,
+            address: (req.body.address) ? req.body.address : req.user.address.address
+        },
+        hash = password;
     const {
         error
     } = updateValidation(req.body);
-    
+
     if (error) return res.render('user/edit_profile.ejs', {
         error: error.message,
         user: req.user,
         title: 'Edit Profile'
     });
 
-    if(password == req.body.password)hash = await bcrypt.hash(password, 10);
-    else hash = password;
-    await User.findByIdAndUpdate(req.user._id,{
+    if (password == req.body.password) hash = await bcrypt.hash(password, 10);
+    await User.findByIdAndUpdate(req.user._id, {
         username: username,
         email: email,
         password: hash,
         fname: fname,
         lname: lname,
         pn: pn,
+        address: address,
         admin: 0
     }, (err, user) => {
         if (err) {
@@ -79,10 +78,55 @@ router.post('/edit-profile', isUser, async (req, res) => {
             req.flash('success', 'Profile updated.');
             res.redirect('/user/edit-profile');
         }
-    })
+    });
+
 });
 
+/*
+ * GET user password
+ */
+router.get('/change-password', isUser, async (req, res) => {
+    res.render('user/change_password.ejs', {
+        title: 'Change Password',
+        user: req.user
+    });
+});
 
+/*
+ * POST user password
+ */
+router.post('/change-password', async (req, res) => {
+    let newPw = req.body.newPw,
+        confirmNewPw = req.body.confirmNewPw,
+        hash = newPw;
+
+    const {
+        error
+    } = passwordValidation(req.body);
+    if (error) return res.render('user/change_password.ejs', {
+        error: error.message,
+        title: 'Edit Password',
+        user: req.user
+    });
+    //console.log(req.body)
+
+
+    hash = await bcrypt.hash(newPw, 10);
+
+    await User.findByIdAndUpdate(req.user._id, {
+        password: hash
+    }, (err, user) => {
+        if (err) {
+            req.flash('danger', 'Invalid!');
+            res.redirect('/user/change-password');
+        }
+        if (user) {
+            req.flash('success', 'Password changed.');
+            res.redirect('/user/change-password');
+        }
+    });
+
+});
 
 
 // Exports

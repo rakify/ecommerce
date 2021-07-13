@@ -7,13 +7,13 @@
         <th>
             <div class="form-group">
                 <label for="username">Change Username: </label>
-                <input type="text" name="username" class="form-control" placeholder="<%= user.username %>" />
+                <input type="text" name="username" class="form-control" value="<%= user.username %>" />
             </div>
         </th>
         <th>
             <div class="form-group">
                 <label for="email">Change Email: </label>
-                <input type="email" name="email" class="form-control" placeholder="<%= user.email %>" />
+                <input type="email" name="email" class="form-control" value="<%= user.email %>" />
             </div>
         </th>
     </table>
@@ -21,27 +21,72 @@
         <th>
             <div class="form-group">
                 <label for="First Name">Change First Name: </label>
-                <input type="text" name="fname" class="form-control" placeholder="<%= user.fname %>" />
+                <input type="text" name="fname" class="form-control" placeholder="First Name"
+                    value="<%= user.fname %>" />
             </div>
         </th>
         <th>
             <div class="form-group">
                 <label for="Last Name">Change Last Name: </label>
-                <input type="text" name="lname" class="form-control" placeholder="<%= user.lname %>" />
+                <input type="text" name="lname" class="form-control" placeholder="Last Name"
+                    value="<%= user.lname %>" />
             </div>
         </th>
         <th>
             <div class="form-group">
-                <label for="Phone Number">Change Phone Number:(+88) </label>
-                <input type="text" name="pn" class="form-control" placeholder="<%= user.pn %>" />
+                <label for="Phone Number">Change Phone Number: (+88) </label>
+                <input type="text" name="pn" class="form-control" placeholder="Phone Number" value="<%= user.pn %>" />
             </div>
         </th>
     </table>
-
+    <table class="table table-borderless">
+        <b><label for="address">Change Delivery Address: </label></b>
+        <th>
+            <div class="form-group">
+                <label for="division">Select Division: </label>
+                <select name="division" id="division">
+                    <% if(user.address[0].division){ %>
+                    <option value="<%= user.address[0].division %>" selected><%= user.address[0].division %></option>
+                    <% } else { %>
+                    <option disabled selected>Select Division</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Barishal'){ %>
+                    <option value="Barishal">Barishal</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Chattogram'){ %>
+                    <option value="Chattogram">Chattogram</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Dhaka'){ %>
+                    <option value="Dhaka">Dhaka</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Khulna'){ %>
+                    <option value="Khulna">Khulna</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Mymensingh'){ %>
+                    <option value="Mymensingh">Mymensingh</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Rajshahi'){ %>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Rangpur'){ %>
+                    <option value="Rangpur">Rangpur</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Sylhet'){ %>
+                    <option value="Sylhet">Sylhet</option>
+                    <% } %>
+                </select>
+            </div>
+        </th>
+        <th>
+            <div class="form-group">
+                <label for="district">Set District: </label>
+                <input type="text" name="district" placeholder="District" value="<%= user.address[0].district %>" />
+            </div>
+        </th>
+    </table>
     <div class="form-group">
-        <b><label for="password">Change Password: </label></b>
-        <i class="fas fa-eye" id="togglePassword"></i>
-        <input type="password" id="password" name="password" class="form-control" placeholder="Password" />
+        <b><label for="district">Set Full Address: </label></b><br>
+        <textarea name="address" class='form-control' id="ck" rows="6" placeholder="Content"><%= user.address[0].address %></textarea>
     </div>
     <br>
     <button type="submit" class="btn btn-primary btn-block">

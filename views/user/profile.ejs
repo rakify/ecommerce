@@ -1,8 +1,55 @@
 <%- include('../_layouts/header') %>
-
 <h1 class="page-title">Profile</h1>
-<li><a href="/user/edit-profile">Edit Profile</a></li>
-<li><a href="/user/address-list">Address Book</a></li>
-<li><a href="#">Talk to admin</a></li>
+<div class="card text-dark bg-light mb-3" style="max-width: 50rem;">
+    <div class="card-header">Personal Information<a href="/user/edit-profile"> [Edit]</a></div>
+    <div class="card-body">
+        <b class="card-title" style="display: inline; float: left;">Username: </b>
+        <p class="card-text text-center"><%= user.username %></p>
+        <b class="card-title" style="display: inline; float: left;">Email: </b>
+        <p class="card-text text-center"><%= user.email %></p>
+        <b class="card-title" style="display: inline; float: left;">First Name: </b>
+        <p class="card-text text-center"><%= (user.fname)? user.fname : "N/A" %></p>
+        <b class="card-title" style="display: inline; float: left;">Last Name: </b>
+        <p class="card-text text-center"><%= (user.lname)? user.lname : "N/A" %></p>
+        <b class="card-title" style="display: inline; float: left;">Phone Number: </b>
+        <p class="card-text text-center"><%= (user.pn)? user.pn : "N/A" %></p>
+    </div>
+</div>
+
+<div class="card text-dark bg-light mb-3" style="max-width: 50rem;">
+    <div class="card-header">Delivery Address<a href="/user/edit-profile"> [Edit]</a></div>
+    <div class="card-body">
+        <b class="card-title" style="display: inline; float: left;">Division: </b>
+        <p class="card-text text-center"><%= (user.address[0].division)? user.address[0].division : "N/A" %></p>
+        <b class="card-title" style="display: inline; float: left;">District: </b>
+        <p class="card-text text-center"><%= (user.address[0].district)? user.address[0].district : "N/A" %></p>
+        <b class="card-title" style="display: inline; float: left;">Full Address: </b>
+        <p class="card-text text-center"><%= (user.address[0].address)? user.address[0].address : "N/A" %></p>
+    </div>
+</div>
+
+<div class="card text-dark bg-light mb-3" style="max-width: 50rem;">
+    <div class="card-header">User Information: </div>
+    <div class="card-body">
+        <b class="card-title" style="display: inline; float: left;">Profile registered at: </b>
+        <p class="card-text text-center"><%= user.createdAt %></p>
+        <b class="card-title" style="display: inline; float: left;">Last profile updated at: </b>
+        <p class="card-text text-center"><%= user.updatedAt %></p>
+    </div>
+</div>
+
+<div class="card text-dark bg-light mb-3" style="max-width: 50rem;">
+    <div class="card-header">Account Settings: </div>
+    <div class="card-body">
+        <ul class="list-group">
+            <li style="list-style-type: circle;">
+                <a href="/user/change-password">Change Password</a>
+            </li>
+            <li style="list-style-type: circle;">
+                <a href="/user/change-type"><%= (user.admin==0)? "Be Seller" : "Be Buyer" %></a>
+            </li>
+        </ul>
+    </div>
+</div>
 
 <%- include('../_layouts/footer') %>

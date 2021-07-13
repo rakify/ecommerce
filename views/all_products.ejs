@@ -1,14 +1,18 @@
 <%- include('_layouts/header') %>
 
-<div class="row products">
+
+<div class="h3 card-header">Recently Added Products</div>
+<div class="row">
     <% products.forEach((product)=>{ %>
-    <div class="col-xs-12 col-md-4">
-        <a class="pa" href="/products/<%= product.category %>/<%= product.slug %>">
-            <img class="pimage" src="/images/product_images/<%= product._id %>/<%= product.images[0] %>" alt="">
+    <div class="col-sm-4">
+        <a class="card-link" href="/products/<%= product.category %>/<%= product.slug %>">
+            <img class="card-img-top" style="width: 10rem;" src="/images/product_images/<%= product._id %>/<%= product.images[0] %>" alt="">
         </a>
-        <h3><%= product.title %></h3>
-        <h4>৳<%= product.price %></h4>
-        <a class="vd" href="/products/<%= product.category %>/<%= product.slug %>">View Details</a>
+        <div class="card-body">
+            <p class="card-text"><%= product.title %></p>
+            <p class="card-text">৳<%= product.price %></p>
+            <a class="card-link" href="/products/<%= product.category %>/<%= product.slug %>">View Details</a>
+        </div>
     </div>
     <% }) %>
 

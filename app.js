@@ -111,8 +111,8 @@ app.use('/user', user);
 app.use('/', pages);
 
 
-//start the server
-const port = 5000;
+//start the server 
+const port = 4000;
 app.listen(port, () => {
   console.log(`Server is running on PORT ${port}`);
 })

@@ -25,6 +25,12 @@ const UserSchema = mongoose.Schema({
     pn: {
         type: String,
     },
+    address: [{
+        _id: false,
+        division: String,
+        district: String,
+        address: String,
+    }],
     admin: {
         type: Number
     }
