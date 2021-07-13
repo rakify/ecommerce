@@ -1,14 +1,18 @@
 <%- include('../_layouts/adminheader') %>
 
-<h2 class='page-title'>Products</h2>
-<a href='/admin/products/add-product' class='btn btn-primary'>Add a new product</a>
+<div class="card" style="width: 70rem;">
+  <div class="card-body">
+    <h5 class="card-title">Products by <%= user.username %></h5>
+    <h6 class="card-subtitle mb-2 text-muted">Your username is the shopname we provide you with..</h6>
+
+<a class="card-link" href='/admin/products/add-product' class='btn btn-primary'>Add a new product</a>
 <br><br>
 
 <% if (count>0) { %>
 <table class='table table-striped alignmiddle'>
     <thead class='thead-light'>
         <tr class='home'>
-            <th>Product</th>
+            <th>Product (Shop)</th>
             <th>Price</th>
             <th>Category</th>
             <th>Product Image</th>
@@ -18,27 +22,34 @@
     </thead>
     <tbody>
         <% products.forEach((product)=> { %>
-        <tr>
-            <td><%= product.title %></td>
+            <% if(user.username == product.seller || user.username == "Admin") { %>
+            <tr>
+            <td><%= product.title %> <b>( <%= (product.seller)?product.seller:"N/A" %> )</b></td>
             <td>৳<%= product.price%></td>
             <td><%= product.category %></td>
             <td>
                 <% if (product.images.length === 0) { %>
-                <img src ='/images/noimage.png' width="100" height="100">   
+                <img src='/images/noimage.png' width="100" height="100">
                 <% } else { %>
-                    <img src ='/images/product_images/<%= product._id %>/<%= product.images[0] %>' width="100" height="100">
-                    <% } %>
+                <img src='/images/product_images/<%= product._id %>/<%= product.images[0] %>' width="100" height="100">
+                <% } %>
             </td>
-            <td><a href="/admin/products/edit-product/<%= product._id %>">Edit</a></td>
-            <td><a href="/admin/products/delete-product/<%= product._id %>" onclick="return confirm('Are you sure?')">Delete</a></td>
+            <td>
+                <a class="card-link" href="/admin/products/edit-product/<%= product._id %>">Edit</a>
+            </td>
+            <td>
+                <a class="card-link" href="/admin/products/delete-product/<%= product._id %>"
+                    onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
         </tr>
-        <% }); %>
+        <% }}); %>
     </tbody>
-</table>    
+</table>
 <% } else { %>
-    <h3 class = 'text-center'> No products available.</h3>
+<h3 class='text-center'> No products available.</h3>
 <% } %>
-
+  </div>
+</div>
 
 
 <%- include('../_layouts/adminfooter') %>

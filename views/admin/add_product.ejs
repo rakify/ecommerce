@@ -5,6 +5,8 @@
 <br><br>
 <form method='post' action='/admin/products/add-product' enctype="multipart/form-data">
 
+    <input type="hidden" name="seller" value="<%= user.username %>">
+
     <div class='mb-3'>
         <label for='' class='form-level'>Title</label>
         <input type='text' class='form-control' name='title' value='<%= product.title %>' placeholder='Title'>
@@ -52,21 +54,6 @@
             reader.readAsDataURL(file[0]);
         }
     }
-    //     <input type='file' accept='image/*' onchange='openFile(event)'><br>
-    // <img id='output'>
-
-    // script
-    // var openFile = function(event) {
-    //     var input = event.target;
-
-    //     var reader = new FileReader();
-    //     reader.onload = function(){
-    //       var dataURL = reader.result;
-    //       var output = document.getElementById('output');
-    //       output.src = dataURL;
-    //     };
-    //     reader.readAsDataURL(input.files[0]);
-    //   };
-</script>
+    </script>
 
 <%- include('../_layouts/adminfooter') %>

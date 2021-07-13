@@ -6,6 +6,8 @@
 
 <form method='post' action='/admin/products/edit-product/<%= product._id %>' enctype="multipart/form-data">
 
+    <input type="hidden" name="seller" value="<%= user.username %>">
+
     <div class='mb-3'>
         <label for='' class='form-level'>Title</label>
         <input type='text' class='form-control' name='title' value='<%= product.title %>' placeholder='Title'>

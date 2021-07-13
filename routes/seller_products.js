@@ -5,7 +5,6 @@ const path = require('path');
 const multer = require('multer');
 const auth = require('../config/auth')
 const isAdmin = auth.isAdmin;
-const isSellerAdmin = auth.isSellerAdmin;
 
 //get productValidation
 const {
@@ -45,13 +44,11 @@ const imageUpload = multer({
 /*
  * GET products index
  */
-router.get('/', isSellerAdmin, (req, res) => {
-    let user = req.user;
+router.get('/', isAdmin, (_req, res) => {
     Product.find((_err, products) => { //if no product available rendered file will handle the err
         res.render('admin/products', {
             products: products,
             count: products.length,
-            user: user
         }); //res.render ends
     }); //Product.find ends
 }); //router.get ends
@@ -59,27 +56,24 @@ router.get('/', isSellerAdmin, (req, res) => {
 /*
  * GET add product
  */
-router.get('/add-product', isSellerAdmin, async (req, res) => {
-    let title, description, price, user = req.user;
+router.get('/add-product', isAdmin, async (_req, res) => {
+    let title, description, price;
     let newProduct = {
         title: title,
         description: description,
         price: price,
     }
-
     await Category.find((err, categories) => { //return await is unnecessary & err not gonna happen here for sure
         if (err) {
             return res.render('admin/add_product', {
                 error: error.details[0].message,
                 product: newProduct,
-                categories: [],
-                user: user
+                categories: []
             });
         }
         res.render('admin/add_product', {
             product: newProduct,
-            categories: categories,
-            user: user
+            categories: categories
         }); //res.render ends
     }); //Category.find ends
 }); //router.get ends
@@ -94,16 +88,12 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
             images.push(req.files[i].filename)
         };
     };
-
-    let seller = req.body.seller,
-        title = req.body.title,
-        slug = title.replace(/\s+/g, '-').toLowerCase(),
-        description = req.body.description,
-        category = req.body.category,
-        price = req.body.price,
-        user = req.user;
+    let title = req.body.title;
+    let slug = title.replace(/\s+/g, '-').toLowerCase();
+    let description = req.body.description;
+    let category = req.body.category;
+    let price = req.body.price
     let newProduct = {
-        seller: seller,
         title: title,
         slug: slug,
         description: description,
@@ -119,8 +109,7 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
             res.render('admin/add_product', {
                 error: error.details[0].message,
                 product: newProduct,
-                categories: categories,
-                user: user
+                categories: categories
             }); //res.render ends
         }); //Category.find ends
     } //if ends
@@ -139,8 +128,7 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
                 res.render('admin/add_product', {
                     error: 'Similar product exist, Try another title.',
                     product: newProduct,
-                    categories: categories,
-                    user: user
+                    categories: categories
                 }); //res.render ends
             }); //Category.find ends
         }; //if ends
@@ -150,38 +138,27 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
 /*
  * GET edit product
  */
-router.get('/edit-product/:id', isSellerAdmin, async (req, res) => {
-    let code = 0,
-        user = req.user;
-    await Product.findById(req.params.id, (_err, product) => {
-        if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") code = 1;
-        else res.redirect('/users/logout');
-    })
-    if (code) {
-        await Product.findById(req.params.id, (err, product) => {
-            if (err) return res.sendStatus(404);
-            res.render('admin/edit_product', {
-                product: product,
-                user: user
-            }); //res.render ends
-        }); //Product.findById ends
-    } //code ends
+router.get('/edit-product/:id', isAdmin, (req, res) => {
+    Product.findById(req.params.id, (err, product) => {
+        if (err) return res.sendStatus(404);
+        res.render('admin/edit_product', {
+            product: product
+        }); //res.render ends
+    }); //Product.findById ends
 }); //router.get ends
 /*
  * POST edit product
  */
 router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, res) => {
-    let seller = req.body.seller,
-        title = req.body.title,
-        slug = title.replace(/\s+/g, '-').toLowerCase(),
-        description = req.body.description,
-        category = req.body.category,
-        price = req.body.price,
-        id = req.params.id,
-        images = req.body.images.split(','),
-        oldImages = images,
-        overSizedImageArray = [1, 2, 3, 4, 5, 6],
-        user = req.user;
+    let title = req.body.title;
+    let slug = title.replace(/\s+/g, '-').toLowerCase(); //all spaces replace with -
+    let description = req.body.description;
+    let category = req.body.category; //hidden input
+    let price = req.body.price;
+    let id = req.params.id;
+    let images = req.body.images.split(',');
+    let oldImages = images;
+    let overSizedImageArray = [1, 2, 3, 4, 5, 6];
     if (req.files !== undefined && images.length + req.files.length < 6) {
         req.files.forEach(image => {
             fs.move(`public/images/product_images/tmp/${image.filename}`, `public/images/product_images/${req.params.id}/${image.filename}`, (err) => {
@@ -197,7 +174,6 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         })
     }
     let newProduct = {
-        seller: seller,
         title: title,
         slug: slug,
         description: description,
@@ -213,8 +189,7 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         newProduct.images = oldImages; //if error return oldImages
         return res.render('admin/edit_product', {
             error: error.details[0].message,
-            product: newProduct,
-            user: user
+            product: newProduct
         });
     };
 
@@ -222,8 +197,7 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         if (err) {
             return res.render('admin/edit_product', {
                 error: 'Similar product exist, Try another title.',
-                product: newProduct,
-                user: user
+                product: newProduct
             });
         };
         req.flash('success', 'Product updated.');
@@ -234,33 +208,26 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
 /*
  * GET delete product
  */
-router.get('/delete-product/:id', isSellerAdmin, async (req, res) => {
-    let code = 0;
-    await Product.findById(req.params.id, (err, product) => {
-        if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") code = 1;
-        else res.redirect('/users/logout');
-    })
-    if (code) {
-        await Product.findByIdAndDelete(req.params.id, (err, product) => {
-            if (err) {
-                req.flash('danger', 'Deletion failed.');
-                res.redirect('/admin/products/');
-            }
-            if (product) {
-                //also delete the folder containing pic
-                fs.remove(`public/images/product_images/${product._id}`, (err) => {
-                    if (err) console.log(err)
-                });
-                req.flash('success', 'Product deleted.');
-                res.redirect('/admin/products/');
-            };
-        });
-    }
+router.get('/delete-product/:id', isAdmin, async (req, res) => {
+    await Product.findByIdAndDelete(req.params.id, (err, product) => {
+        if (err) {
+            req.flash('danger', 'Deletion failed.');
+            res.redirect('/admin/products/');
+        }
+        if (product) {
+            //also delete the folder containing pic
+            fs.remove(`public/images/product_images/${product._id}`, (err) => {
+                if (err) console.log(err)
+            });
+            req.flash('success', 'Product deleted.');
+            res.redirect('/admin/products/');
+        };
+    });
 });
 /*
  * GET delete image
  */
-router.get('/delete-image/:image', isSellerAdmin, async (req, res) => {
+router.get('/delete-image/:image', isAdmin, async (req, res) => {
     let id = req.query.id,
         image = req.params.image;
     fs.remove(`public/images/product_images/${id}/${image}`, err => {
@@ -278,10 +245,10 @@ router.get('/delete-image/:image', isSellerAdmin, async (req, res) => {
                     res.redirect(`/admin/products/edit-product/${req.query.id}`)
                 }
                 if (err) console.log('couldnt update mongoose in get delete image')
-            }); //Product.findByIdAndUpdate ends
-        }; //if(!err) ends
-    }); //fs.remove ends
-}); //get router delete image ends
+            });//Product.findByIdAndUpdate ends
+        };//if(!err) ends
+    });//fs.remove ends
+});//get router delete image ends
 
 
 

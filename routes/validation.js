@@ -33,6 +33,8 @@ const categoryValidation = (data) => {
 
 const productValidation = (data) => {
     const schema = Joi.object({
+        seller: Joi.string()
+            .required(),
         title: Joi.string()
             .min(3)
             .trim()
@@ -50,7 +52,7 @@ const productValidation = (data) => {
             .required(),
         images: Joi.array()
             .max(5)
-            .allow(''),
+            .required(),
         _id: Joi.string()
     });
     return schema.validate(data);

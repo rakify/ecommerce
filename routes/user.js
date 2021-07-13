@@ -128,6 +128,28 @@ router.post('/change-password', async (req, res) => {
 
 });
 
+/*
+ * POST let user be seller or buyer
+ */
+router.post('/profile', async (req, res) => {
+    let admin;
+    if(req.user.admin==0)admin = 2;
+    if(req.user.admin==2)admin = 0;
+    await User.findByIdAndUpdate(req.user._id, {
+        admin: admin
+    }, (err, user) => {
+        if (err) {
+            req.flash('danger', 'Something went wrong!');
+            res.redirect('/profile');
+        }
+        if (user) {
+            req.flash('success', 'Profile Updated.');
+            res.redirect('/user/profile');
+        }
+    });
+
+});
+
 
 // Exports
 module.exports = router;

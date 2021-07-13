@@ -43,6 +43,12 @@
         <% if (user && user.admin==1) { %>
         <div class="text-end btn btn-outline-light me-2">
           <a href="/users/logout">Logout</a> | <a href="/admin/pages"> Admin Area</a>
+          | <a href="/user/profile"> Profile</a>
+        </div>
+        <% } else if (user && user.admin==2) { %>
+        <div class="text-end btn btn-outline-light me-2">
+          <a href="/users/logout">Logout</a> | <a href="/admin/products"> Seller Area</a>
+          | <a href="/user/profile"> Profile</a>
         </div>
         <% } else if (user) { %>
         <div class="text-end btn btn-outline-light me-2">Hi, <%= user.username %>
@@ -56,7 +62,6 @@
         <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
           <input type="search" class="form-control form-control-dark" placeholder="Search...">
         </form>
-        <% if (user) { %>
         <div class="'btn btn-warning">
           <ul class="nav  navbar-right col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
             <li> <a href="/cart/checkout" class="nav-link px-2 text-white">My Cart (
@@ -68,7 +73,6 @@
                 )</a></li>
           </ul>
         </div>
-        <% } %>
       </div>
     </div>
   </header>
@@ -86,5 +90,3 @@
     <% if (error) {%>
     <div class="alert alert-danger"><%= error %></div>
     <% }%>
-    
-      
