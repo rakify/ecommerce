@@ -129,6 +129,41 @@ router.post('/change-password', async (req, res) => {
 });
 
 /*
+ * GET user address
+ */
+router.get('/set-address', isUser, async (req, res) => {
+    res.render('user/set_address.ejs', {
+        title: 'Set Delivery Address',
+        user: req.user
+    });
+});
+
+/*
+ * POST user address
+ */
+router.post('/set-address', async (req, res) => {
+    let address = {
+        division: (req.body.division) ? req.body.division : req.user.address.division,
+        district: (req.body.district) ? req.body.district : req.user.address.district,
+        address: (req.body.address) ? req.body.address : req.user.address.address
+    }
+    await User.findByIdAndUpdate(req.user._id, {
+address: address
+    }, (err, user) => {
+        if (err) {
+            req.flash('danger', 'Failed!');
+            res.redirect('/user/set-address');
+        }
+        if (user) {
+            req.flash('success', 'Delivery address added.');
+            res.redirect('/user/profile');
+        }
+    });
+
+});
+
+
+/*
  * POST let user be seller or buyer
  */
 router.post('/profile', async (req, res) => {

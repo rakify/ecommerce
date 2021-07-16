@@ -1,0 +1,72 @@
+<%- include('../_layouts/header') %>
+
+<h2 class="page-title"><%= title %></h2>
+
+<form method='post' action="/user/set-address">
+    <table class="table table-borderless">
+        <b><label for="address">Change Delivery Address: </label></b>
+        <th>
+            <div class="form-group">
+                <label for="division">Select Division: </label>
+                <select name="division" id="division">
+                    <% if(user.address[0]){ %>
+                    <option value="<%= user.address[0].division %>" selected><%= user.address[0].division %></option>
+                    <% if(user.address[0].division!='Barishal'){ %>
+                    <option value="Barishal">Barishal</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Chattogram'){ %>
+                    <option value="Chattogram">Chattogram</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Dhaka'){ %>
+                    <option value="Dhaka">Dhaka</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Khulna'){ %>
+                    <option value="Khulna">Khulna</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Mymensingh'){ %>
+                    <option value="Mymensingh">Mymensingh</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Rajshahi'){ %>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Rangpur'){ %>
+                    <option value="Rangpur">Rangpur</option>
+                    <% } %>
+                    <% if(user.address[0].division!='Sylhet'){ %>
+                    <option value="Sylhet">Sylhet</option>
+                    <% } %>
+                    <% } else { %>
+                    <option disabled selected>Select Division</option>
+                    <option value="Barishal">Barishal</option>
+                    <option value="Chattogram">Chattogram</option>
+                    <option value="Dhaka">Dhaka</option>
+                    <option value="Khulna">Khulna</option>
+                    <option value="Mymensingh">Mymensingh</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Rangpur">Rangpur</option>
+                    <option value="Sylhet">Sylhet</option>
+                   
+                    <% } %>
+
+                </select>
+            </div>
+        </th>
+        <th>
+            <div class="form-group">
+                <label for="district">Set District: </label>
+                <input type="text" name="district" placeholder="District" value="<%= (locals.user.address[0])?user.address[0].district:"" %>" />
+            </div>
+        </th>
+    </table>
+    <div class="form-group">
+        <b><label for="district">Set Full Address: </label></b><br>
+        <textarea name="address" class='form-control' id="ck" rows="6"
+            placeholder="Full Address"><%= (locals.user.address[0])?user.address[0].address:"" %></textarea>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary btn-block">
+        Set
+    </button>
+</form>
+
+<%- include('../_layouts/footer') %>

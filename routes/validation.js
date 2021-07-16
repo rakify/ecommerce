@@ -52,6 +52,7 @@ const productValidation = (data) => {
             .required(),
         images: Joi.array()
             .max(5)
+            .min(1)
             .required(),
         _id: Joi.string()
     });
@@ -61,21 +62,21 @@ const productValidation = (data) => {
 const registerValidation = (data) => {
     const schema = Joi.object({
         username: Joi.string()
-            .min(3).
-        required(),
-        email: Joi.string()
-            .email()
-            .allow(""),
-        password: Joi.string()
             .min(3)
             .required(),
+        email: Joi.string()
+            .email()
+            .allow(''),
+        password: Joi.string()
+            .min(3)
+            .allow(''),
         password2: Joi.any().equal(Joi.ref('password'))
-            .required()
             .options({
                 messages: {
                     'any.only': 'Passwords do not match'
                 }
-            }),
+            })
+            .allow(""),
         fname: Joi.string()
             .min(3)
             .allow(""),
@@ -83,9 +84,14 @@ const registerValidation = (data) => {
             .min(3)
             .allow(""),
         pn: Joi.string()
-            .min(11)
-            .allow(""),
-    });
+            .length(11)
+            .pattern(/^\d+$/) //d for only digits
+            .allow("")
+            .messages({
+                'string.length': 'Phone number must contain 11 digits',
+                'string.pattern.base': 'Phone number must contain only digits'
+            }),
+        });
     return schema.validate(data);
 }
 
@@ -137,12 +143,6 @@ const updateValidation = (data) => {
                 'string.length': 'Phone number must contain 11 digits',
                 'string.pattern.base': 'Phone number must contain only digits'
             }),
-        division: Joi.string()
-            .allow(""),
-        district: Joi.string()
-            .allow(""),
-        address: Joi.string()
-            .allow(""),
     });
     return schema.validate(data);
 }

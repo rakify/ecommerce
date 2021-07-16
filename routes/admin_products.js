@@ -41,7 +41,6 @@ const imageUpload = multer({
     }
 })
 
-
 /*
  * GET products index
  */
@@ -67,8 +66,8 @@ router.get('/add-product', isSellerAdmin, async (req, res) => {
         price: price,
     }
 
-    await Category.find((err, categories) => { //return await is unnecessary & err not gonna happen here for sure
-        if (err) {
+    await Category.find((err, categories) => {
+        if (err) { // When no category added by admin yet
             return res.render('admin/add_product', {
                 error: error.details[0].message,
                 product: newProduct,
@@ -93,7 +92,7 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
         for (let i = 0; i < req.files.length; i++) {
             images.push(req.files[i].filename)
         };
-    };
+    }
 
     let seller = req.body.seller,
         title = req.body.title,
@@ -115,7 +114,7 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
         error
     } = productValidation(newProduct);
     if (error) {
-        return Category.find((_err, categories) => { //return await is unnecessary & err not gonna happen here for sure
+        return Category.find((_err, categories) => {
             res.render('admin/add_product', {
                 error: error.details[0].message,
                 product: newProduct,
@@ -127,7 +126,8 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
     Product.create(newProduct, (err, product) => {
         if (product) {
             images.forEach((image) => {
-                fs.move(`public/images/product_images/tmp/${image}`, `public/images/product_images/${product._id}/${image}`, (err) => {
+                fs.move(`public/images/product_images/tmp/${image}`,
+                `public/images/product_images/${product._id}/${image}`, (err) => {
                     if (err) console.log('error req.files on post add-product');
                 });
             });
@@ -151,26 +151,56 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
  * GET edit product
  */
 router.get('/edit-product/:id', isSellerAdmin, async (req, res) => {
-    let code = 0,
-        user = req.user;
-    await Product.findById(req.params.id, (_err, product) => {
-        if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") code = 1;
-        else res.redirect('/users/logout');
-    })
-    if (code) {
-        await Product.findById(req.params.id, (err, product) => {
-            if (err) return res.sendStatus(404);
-            res.render('admin/edit_product', {
+
+    /* 
+   
+    Since this path requires the product id and the id is visible to all users shopping here so any registered
+    user can easily edit the product by making a link by themself.
+    I am making sure whoever trying to access the link is
+    1. Either the admin himself or
+    2. The real owner of the product.
+    To anyone else send status code 403 (Forbidden)
+
+    Now what if user is trying to edit a product that is linked incorrectly or not available!
+    Send status code 404 (Not found)
+    
+    */
+
+    await Product.findById(req.params.id, (err, product) => {
+        if (err) return res.sendStatus(404);
+        if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") {
+            return res.render('admin/edit_product', {
                 product: product,
-                user: user
-            }); //res.render ends
-        }); //Product.findById ends
-    } //code ends
-}); //router.get ends
+                user: req.user
+            });
+        } else return res.sendStatus(403);
+    });
+});
 /*
  * POST edit product
  */
 router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, res) => {
+
+    /*
+
+    ?? What if user is trying to upload images more than 5.
+    >> They cant do it at a time since the max upload is 5.
+
+    ?? But they can do it when they edit a product.
+    >> If they try to do so validation will handle this. In validation.js theres a schema called images which will
+    handle the images array so it doesnt exceed 5. When it exceeds I will send overSizedImageArray thus
+    it will show error. I dont want to lose my previous images array so I will store it in oldImages.
+
+    ?? What happens to the extra images. 
+    >> I dont want to store images when they exceed size thats why I store them in a tmp (temporary) folder. If
+    they exceeds size I will empty the tmp directory and
+    if they pass the validation process I will move them to the products own folder.
+
+    ?? Where do i store images.
+    >> I actually store images to the computer and store only the filenames to the database.
+
+    */
+
     let seller = req.body.seller,
         title = req.body.title,
         slug = title.replace(/\s+/g, '-').toLowerCase(),
@@ -184,9 +214,10 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         user = req.user;
     if (req.files !== undefined && images.length + req.files.length < 6) {
         req.files.forEach(image => {
-            fs.move(`public/images/product_images/tmp/${image.filename}`, `public/images/product_images/${req.params.id}/${image.filename}`, (err) => {
-                if (err) console.log('err at moving at post edit product');
-            });
+            fs.move(`public/images/product_images/tmp/${image.filename}`,
+                `public/images/product_images/${req.params.id}/${image.filename}`, (err) => {
+                    if (err) console.log('err at moving at post edit product');
+                });
         })
         let filenames = req.files.map((file) => file.filename);
         images.push(...filenames);
@@ -210,7 +241,15 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         error
     } = productValidation(newProduct);
     if (error) {
-        newProduct.images = oldImages; //if error return oldImages
+        newProduct.images = oldImages;
+
+        /*
+        
+        if validation process fails, return oldImages to the images array and everything else
+        will be the same as user previously input.
+        
+        */
+
         return res.render('admin/edit_product', {
             error: error.details[0].message,
             product: newProduct,
@@ -222,6 +261,13 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         if (err) {
             return res.render('admin/edit_product', {
                 error: 'Similar product exist, Try another title.',
+
+                /*
+        
+                Only one of a kind error can happen here so
+        
+                */
+
                 product: newProduct,
                 user: user
             });
@@ -235,52 +281,73 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
  * GET delete product
  */
 router.get('/delete-product/:id', isSellerAdmin, async (req, res) => {
-    let code = 0;
-    await Product.findById(req.params.id, (err, product) => {
-        if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") code = 1;
-        else res.redirect('/users/logout');
-    })
-    if (code) {
-        await Product.findByIdAndDelete(req.params.id, (err, product) => {
-            if (err) {
-                req.flash('danger', 'Deletion failed.');
-                res.redirect('/admin/products/');
-            }
-            if (product) {
-                //also delete the folder containing pic
-                fs.remove(`public/images/product_images/${product._id}`, (err) => {
-                    if (err) console.log(err)
-                });
-                req.flash('success', 'Product deleted.');
-                res.redirect('/admin/products/');
-            };
-        });
-    }
+
+    /*
+
+    >> If the link with provided id is not found return send status code 404 (not found)
+
+    >> If the link provided by the real seller or the admin then give him access. Otherwise return status code
+    403 (forbidden)
+
+    */
+
+    Product.findById(req.params.id, async (err, product) => {
+        if (err) {
+            return res.sendStatus(404);
+        }
+        if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") {
+            await Product.findByIdAndDelete(req.params.id, (err, product) => {
+                if (err) {
+                    req.flash('danger', 'Deletion failed.');
+                    res.redirect('/admin/products/');
+                }
+                if (product) {
+                    //also delete the folder containing pic
+                    fs.remove(`public/images/product_images/${product._id}`, (err) => {
+                        if (err) console.log(err)
+                    });
+                    req.flash('success', 'Product deleted.');
+                    res.redirect('/admin/products/');
+                };
+            });
+        } else return res.sendStatus(403);
+    });
 });
+
+
 /*
  * GET delete image
  */
-router.get('/delete-image/:image', isSellerAdmin, async (req, res) => {
+router.get('/delete-image/:image', isSellerAdmin, (req, res) => {
+    /*
+    
+    ?? Anyone with the image name and product id can delete the image.
+    >> Fixed it.
+    
+    */
     let id = req.query.id,
         image = req.params.image;
-    fs.remove(`public/images/product_images/${id}/${image}`, err => {
+    Product.findById(id, (err, product) => {
         if (err) {
-            console.log(`err while deleting pic`);
+            return res.sendStatus(404);
         }
-        if (!err) {
-            Product.findByIdAndUpdate(id, {
-                $pull: {
-                    images: image
-                }
-            }, (err, product) => {
-                if (product) {
-                    req.flash('success', 'Image deleted.');
-                    res.redirect(`/admin/products/edit-product/${req.query.id}`)
-                }
-                if (err) console.log('couldnt update mongoose in get delete image')
-            }); //Product.findByIdAndUpdate ends
-        }; //if(!err) ends
-    }); //fs.remove ends
+        if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") {
+            fs.remove(`public/images/product_images/${id}/${image}`, async err => {
+                if (err) return res.sendStatus(404);
+                await Product.findByIdAndUpdate(id, {
+                    $pull: {
+                        images: image
+                    }
+                }, (err, product) => {
+                    if (product) {
+                        req.flash('success', 'Image deleted.');
+                        res.redirect(`/admin/products/edit-product/${req.query.id}`)
+                    }
+                    if (err) return res.sendStatus(404);
+                }); //Product.findByIdAndUpdate ends
+            }); //fs.remove ends
+        } else return res.sendStatus(403);
+    })
 }); //get router delete image ends
 
 

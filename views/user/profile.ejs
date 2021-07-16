@@ -17,14 +17,18 @@
 </div>
 
 <div class="card text-dark bg-light mb-3" style="max-width: 50rem;">
-    <div class="card-header">Delivery Address<a href="/user/edit-profile"> [Edit]</a></div>
+    <div class="card-header">Delivery Address<a href="/user/set-address"> [Set]</a></div>
     <div class="card-body">
+        <% if (user.address[0]){ %>
         <b class="card-title" style="display: inline; float: left;">Division: </b>
         <p class="card-text text-center"><%= (user.address[0].division)? user.address[0].division : "N/A" %></p>
         <b class="card-title" style="display: inline; float: left;">District: </b>
         <p class="card-text text-center"><%= (user.address[0].district)? user.address[0].district : "N/A" %></p>
         <b class="card-title" style="display: inline; float: left;">Full Address: </b>
         <p class="card-text text-center"><%= (user.address[0].address)? user.address[0].address : "N/A" %></p>
+    <% } else { %>
+        You have not set your delivery address yet.
+        <% } %>
     </div>
 </div>
 
@@ -32,7 +36,7 @@
     <div class="card-header">User Information: </div>
     <div class="card-body">
         <b class="card-title" style="display: inline; float: left;">User Type: </b>
-        <p class="card-text text-center"><%= (user.admin==0)? "Regular Buyer" : "Seller" %></p>
+        <p class="card-text text-center"><%= (user.admin==0)? "Buyer" : "Seller" %></p>
         <b class="card-title" style="display: inline; float: left;">Profile registered at: </b>
         <p class="card-text text-center"><%= user.createdAt %></p>
         <b class="card-title" style="display: inline; float: left;">Last profile updated at: </b>
@@ -41,7 +45,7 @@
 </div>
 
 <div class="card text-dark bg-light mb-3" style="max-width: 50rem;">
-    <div class="card-header">Other Settings: </div>
+    <div class="card-header">Settings: </div>
     <div class="card-body">
         <ul class="list-group">
             <li style="list-style-type: circle;">

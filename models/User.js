@@ -1,4 +1,4 @@
-const mongoose                                                             = require('mongoose');
+const mongoose = require('mongoose');
 
 //user schema
 const UserSchema = mongoose.Schema({
@@ -17,7 +17,7 @@ const UserSchema = mongoose.Schema({
         required: true
     },
     fname: {
-        type: String
+        type: String,
     },
     lname: {
         type: String,
@@ -27,15 +27,22 @@ const UserSchema = mongoose.Schema({
     },
     address: [{
         _id: false,
-        division: String,
-        district: String,
-        address: String,
+        division: {
+            type: String,
+        },
+        district: {
+            type: String,
+        },
+        address: {
+            type: String,
+        },
     }],
     admin: {
-        type: Number
+        type: Number,
     }
-}, {timestamps: true}
-)
+}, {
+    timestamps: true
+})
 
 
-module.exports = mongoose.model('User',UserSchema);
+module.exports = mongoose.model('User', UserSchema);
