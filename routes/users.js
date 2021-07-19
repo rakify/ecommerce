@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
         fname = req.body.fname,
         lname = req.body.lname,
         pn = req.body.pn
-
+        
     User.create({
         username: username,
         email: email,

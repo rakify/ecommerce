@@ -1,0 +1,56 @@
+<%- include('_layouts/header') %>
+
+<div class="h3 card-header"><%= title %></div>
+
+<div class="row products">
+    <% if(products.length==0){ %>
+    No products available by this category
+    <% } %>
+    <% products.forEach((product)=>{ %>
+    <div class="col-xs-12 col-md-4">
+        <a class="pa" href="/products/<%= product.category %>/<%= product.slug %>">
+            <img class="pimage" src="/images/product_images/<%= product._id %>/<%= product.images[0] %>" alt="">
+        </a>
+        <div class="card-body">
+            <span class="h6"><%= product.title %></span> <span class="badge badge-success">৳
+                <%= product.price %></span><br>
+            <a class="vd" href="/products/<%= product.category %>/<%= product.slug %>">View Details</a>
+        </div>
+    </div>
+    <% }) %>
+</div>
+
+
+<!-- Pagination begins -->
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-end">
+        <% if(first>1) { %>
+        <li class="page-item"><a class="page-link" href="/products/<%= category %>?page=<%= first-1 %>">Previous</a>
+        </li>
+        <% } else { %>
+        <li class="page-item disabled"><a class="page-link"
+                href="/products/<%= category %>?page=<%= first-1 %>">Previous</a></li>
+        <% } %>
+        <% if(max>first) { %>
+        <li class="page-item"><a class="page-link"
+                href="/products/<%= category %>?page=<%= first+1 %>"><%= first+1 %></a></li>
+        <% } %>
+        <% if(max>first+1) { %>
+        <li class="page-item"><a class="page-link"
+                href="/products/<%= category %>?page=<%= first+2 %>"><%= first+2 %></a></li>
+        <% } %>
+        <% if(max>first+2) { %>
+        <li class="page-item"><a class="page-link"
+                href="/products/<%= category %>?page=<%= first+3 %>"><%= first+3 %></a></li>
+        <% } %>
+        <% if(max>first) { %>
+        <li class="page-item"><a class="page-link" href="/products/<%= category %>?page=<%= first+1 %>">Next</a></li>
+        <% } else { %>
+        <li class="page-item disabled"><a class="page-link"
+                href="/products/<%= category %>?page=<%= first+1 %>">Next</a></li>
+        <% } %>
+    </ul>
+</nav>
+
+
+<%- include('_layouts/footer') %>

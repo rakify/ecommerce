@@ -46,6 +46,14 @@ Category.find((err, categories)=> {
     if(categories)app.locals.categories = categories;
 });
 
+// Get User Model
+let User = require('./models/User');
+
+// Get sellers name to pass to header.ejs
+User.find({admin: 2},(_err,user)=>{
+app.locals.seller = user; 
+}); 
+
 //multer middleware
 const multer = require('multer');
 //default error handler & multer

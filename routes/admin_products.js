@@ -154,14 +154,14 @@ router.get('/edit-product/:id', isSellerAdmin, async (req, res) => {
 
     /* 
    
-    Since this path requires the product id and the id is visible to all users shopping here so any registered
+    >> Since this path requires the product id and the id is visible to all users shopping here so any registered
     user can easily edit the product by making a link by themself.
     I am making sure whoever trying to access the link is
     1. Either the admin himself or
     2. The real owner of the product.
     To anyone else send status code 403 (Forbidden)
 
-    Now what if user is trying to edit a product that is linked incorrectly or not available!
+    >> Now what if user is trying to edit a product that is linked incorrectly or not available!
     Send status code 404 (Not found)
     
     */
@@ -171,7 +171,8 @@ router.get('/edit-product/:id', isSellerAdmin, async (req, res) => {
         if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") {
             return res.render('admin/edit_product', {
                 product: product,
-                user: req.user
+                user: req.user,
+                title: "Edit a Product"
             });
         } else return res.sendStatus(403);
     });
@@ -198,6 +199,9 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
 
     ?? Where do i store images.
     >> I actually store images to the computer and store only the filenames to the database.
+
+    ?? What if user is delete all pics
+    >>
 
     */
 
