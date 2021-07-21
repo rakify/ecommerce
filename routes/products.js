@@ -14,23 +14,27 @@ router.get('/', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 6;
     const count = await Product.countDocuments().exec();
-    const max = Math.ceil(count / limit);//maximum pages available
+    const max = Math.ceil(count / limit) || 1; //maximum pages available if no pages available set it to 1
 
     // In case someone asks for a page(>0) that doesnt exist redirect him to the last page
     if (page > max) {
         res.redirect(`/products/?page=${max}`)
     }
+    // In case someone asks for a page(<1) that doesnt exist redirect him to the first page
+    if (page < 1) {
+        res.redirect(`/products/?page=1`)
+    }
 
     let startLink, endLink;
     // Before the actual page, let it have at most 3 links
-    if(page-3>=1) startLink = page-3;
-    else if(page-2>=1) startLink = page-2;
-    else if(page-1>=1) startLink = page-1;
+    if (page - 3 >= 1) startLink = page - 3;
+    else if (page - 2 >= 1) startLink = page - 2;
+    else if (page - 1 >= 1) startLink = page - 1;
     else startLink = page;
     // After the actual page, let it have at most 3 links
-    if(page+3<=max) endLink = page+3;
-    else if(page+2<=max) endLink = page+2;
-    else if(page+1<=max) endLink = page+1;
+    if (page + 3 <= max) endLink = page + 3;
+    else if (page + 2 <= max) endLink = page + 2;
+    else if (page + 1 <= max) endLink = page + 1;
     else endLink = page;
 
     Product.find((_err, products) => {
@@ -62,23 +66,27 @@ router.get('/shop/:seller', async (req, res) => {
     const limit = parseInt(req.query.limit) || 6;
     let count = await Product.find({
         seller: req.params.seller
-    }).count();
-    const max = Math.ceil(count / limit);
- 
+    }).countDocuments();
+    const max = Math.ceil(count / limit) || 1;
+
     if (page > max) {
-        res.redirect(`/products/?page=${max}`)
+        res.redirect(`/products/shop/${req.params.seller}/?page=${max}`)
+    }
+
+    if (page < 1) {
+        res.redirect(`/products/shop/${req.params.seller}/?page=${max}`)
     }
 
     let startLink, endLink;
 
-    if(page-3>=1) startLink = page-3;
-    else if(page-2>=1) startLink = page-2;
-    else if(page-1>=1) startLink = page-1;
+    if (page - 3 >= 1) startLink = page - 3;
+    else if (page - 2 >= 1) startLink = page - 2;
+    else if (page - 1 >= 1) startLink = page - 1;
     else startLink = page;
 
-    if(page+3<=max) endLink = page+3;
-    else if(page+2<=max) endLink = page+2;
-    else if(page+1<=max) endLink = page+1;
+    if (page + 3 <= max) endLink = page + 3;
+    else if (page + 2 <= max) endLink = page + 2;
+    else if (page + 1 <= max) endLink = page + 1;
     else endLink = page;
 
     Product.find({
@@ -109,23 +117,27 @@ router.get('/:category', async (req, res) => {
     const limit = parseInt(req.query.limit) || 6;
     let count = await Product.find({
         category: req.params.category
-    }).count();
-    const max = Math.ceil(count / limit);
+    }).countDocuments();
+    const max = Math.ceil(count / limit) || 1;
 
-     if (page > max) {
-        res.redirect(`/products/?page=${max}`)
+    if (page > max) {
+        res.redirect(`/products/${req.params.category}?page=${max}`)
+    }
+
+    if (page < 1) {
+        res.redirect(`/products/${req.params.category}?page=${max}`)
     }
 
     let startLink, endLink;
 
-    if(page-3>=1) startLink = page-3;
-    else if(page-2>=1) startLink = page-2;
-    else if(page-1>=1) startLink = page-1;
+    if (page - 3 >= 1) startLink = page - 3;
+    else if (page - 2 >= 1) startLink = page - 2;
+    else if (page - 1 >= 1) startLink = page - 1;
     else startLink = page;
 
-    if(page+3<=max) endLink = page+3;
-    else if(page+2<=max) endLink = page+2;
-    else if(page+1<=max) endLink = page+1;
+    if (page + 3 <= max) endLink = page + 3;
+    else if (page + 2 <= max) endLink = page + 2;
+    else if (page + 1 <= max) endLink = page + 1;
     else endLink = page;
 
     Category.findOne({
