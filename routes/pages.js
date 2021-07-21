@@ -15,10 +15,11 @@ router.get('/', (req, res) => {
             console.log(err);
         }
         if (page) {
-            res.render('index', {
-                title: page.title,
-                content: page.content
-            });
+            // res.render('index', {
+            //     title: page.title,
+            //     content: page.content
+            // });
+            res.redirect('/products')
         }
     });
 

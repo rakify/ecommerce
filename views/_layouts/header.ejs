@@ -7,8 +7,11 @@
 
   <title><%- title %></title>
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+  </script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -29,87 +32,89 @@
   <header class="p-3 bg-dark text-white">
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-secondary text-decoration-none">
-          Rakify Mall
-        </a>
-
+        <div class="words word-1">
+          <span>R</span>
+          <span>A</span>
+          <span>K</span>
+          <span>I</span>
+          <span>F</span>
+          <span>Y</span>
+        </div>
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <% pages.forEach(page=> { %>
           <% if (page.slug == 'home') { %>
-          <li> <a href="/" class="nav-link px-2 text-white"><%= page.title %></a></li>
+          <li> <a href="/" class="nav-link text-white"><%= page.title %></a></li>
           <% } else { %>
-          <li> <a href="/<%= page.slug %>" class="nav-link px-2 text-white"><%= page.title %></a></li>
+          <li> <a href="/<%= page.slug %>" class="nav-item active nav-link text-white"><%= page.title %></a></li>
           <% }}) %>
         </ul>
         <% if (user && user.admin==1) { %>
-        <div class="text-end btn btn-outline-light me-2">
+        <div class="text-end btn btn-outline-light me-2 text-white">
           <a href="/users/logout">Logout</a> | <a href="/admin/pages"> Admin Area</a>
           | <a href="/user/profile"> Profile</a>
         </div>
         <% } else if (user && user.admin==2) { %>
-        <div class="text-end btn btn-outline-light me-2">
+        <div class="text-end btn btn-outline-light me-2 text-white">
           <a href="/users/logout">Logout</a> | <a href="/admin/products"> Seller Area</a>
           | <a href="/user/profile"> Profile</a>
         </div>
         <% } else if (user) { %>
-        <div class="text-end btn btn-outline-light me-2">Hi, <%= user.username %>
+        <div class="text-end btn btn-outline-light me-2 text-white">Hi, <%= user.username %>
           (<a href="/users/logout">Logout</a>) | <a href="/user/profile">Profile</a>
         </div>
         <% } else { %>
-        <div class="text-end btn btn-outline-light me-2"><a href="/users/login"> Login</a> |
+        <div class="text-end btn btn-outline-light me-2 text-white"><a href="/users/login"> Login</a> |
           <a href="/users/register"> Register</a>
         </div>
         <% } %>
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-          <input type="search" class="form-control form-control-dark" placeholder="Search...">
+        <form class="form-control-sm">
+          <input type="search" class="form-control form-control-dark" placeholder="Not prepared yet...">
         </form>
-        <div class="'btn btn-warning">
-          <ul class="nav  navbar-right col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-            <li> <a href="/cart/checkout" class="nav-link px-2 text-white">My Cart (
-                <% if(typeof cart!='undefined'){ %>
-                <%= cart.length %>
-                <% } else { %>
-                0
-                <% } %>
-                )</a></li>
-          </ul>
+        <div class="btn btn-warning">
+          <a href="/cart/checkout" class="nav-link px-2 text-white">My Cart (
+            <% if(typeof cart!='undefined'){ %>
+            <%= cart.length %>
+            <% } else { %>
+            0
+            <% } %>
+            )</a>
         </div>
       </div>
     </div>
   </header>
 
 
-<!--
+  <!--
 Dropdown menu for categories
  -->
-
   <span class="dropdown">
-    <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+    <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown"
+      aria-expanded="false">
       Categories
     </a>
-  
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
       <li><a href="/products" class="dropdown-item">All products</a></li>
       <% categories.forEach((c)=>{ %>
-        <li><a href="/products/<%= c.slug %>" class="dropdown-item"><%= c.title %></a></li>
-        <% }) %>
+      <li><a href="/products/<%= c.slug %>" class="dropdown-item"><%= c.title %></a></li>
+      <% }) %>
     </ul>
   </span>
 
-<!--
+  <!--
 Dropdown menu for shop name
  -->
 
   <span class="dropdown">
-    <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+    <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown"
+      aria-expanded="false">
       Shops
     </a>
-  
+
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
       <li><a href="/products/shop/Admin" class="dropdown-item">Admin products</a></li>
       <% seller.forEach((s)=>{ %>
-        <li><a href="/products/shop/<%= s.username %>" class="dropdown-item"><%= s.username %></a></li>
-        <% }) %>
+      <li><a href="/products/shop/<%= s.username %>" class="dropdown-item"><%= s.username %></a></li>
+      <% }) %>
     </ul>
   </span>
 

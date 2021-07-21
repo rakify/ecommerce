@@ -50,7 +50,8 @@ router.get('/', isSellerAdmin, (req, res) => {
         res.render('admin/products', {
             products: products,
             count: products.length,
-            user: user
+            user: user,
+            title: "Products Control Panel"
         }); //res.render ends
     }); //Product.find ends
 }); //router.get ends
@@ -72,13 +73,15 @@ router.get('/add-product', isSellerAdmin, async (req, res) => {
                 error: error.details[0].message,
                 product: newProduct,
                 categories: [],
-                user: user
+                user: user,
+                title: "Products Control Panel"
             });
         }
         res.render('admin/add_product', {
             product: newProduct,
             categories: categories,
-            user: user
+            user: user,
+            title: "Products Control Panel"
         }); //res.render ends
     }); //Category.find ends
 }); //router.get ends
@@ -119,7 +122,8 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
                 error: error.details[0].message,
                 product: newProduct,
                 categories: categories,
-                user: user
+                user: user,
+                title: "Products Control Panel"
             }); //res.render ends
         }); //Category.find ends
     } //if ends
@@ -140,7 +144,8 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
                     error: 'Similar product exist, Try another title.',
                     product: newProduct,
                     categories: categories,
-                    user: user
+                    user: user,
+                    title: "Products Control Panel"
                 }); //res.render ends
             }); //Category.find ends
         }; //if ends
@@ -257,7 +262,8 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         return res.render('admin/edit_product', {
             error: error.details[0].message,
             product: newProduct,
-            user: user
+            user: user,
+            title: "Products Control Panel"
         });
     };
 
@@ -273,7 +279,8 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
                 */
 
                 product: newProduct,
-                user: user
+                user: user,
+                title: "Products Control Panel"
             });
         };
         req.flash('success', 'Product updated.');

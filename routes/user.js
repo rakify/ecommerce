@@ -7,10 +7,183 @@ const {
 } = require('./validation');
 const auth = require('../config/auth')
 const isUser = auth.isUser;
+// For password reset
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 
 // Get User Model
 let User = require('../models/User');
+
+
+
+/*
+ * GET forgot-password
+ */
+router.get('/forgot-password', (req, res) => {
+
+    res.render('user/forgot_password', {
+        title: "Forgot Password"
+    })
+});
+
+/*
+ * POST forgot-password
+ */
+router.post('/forgot-password', (req, res, next) => {
+    const {
+        email
+    } = req.body;
+
+    User.findOne({
+        email: email
+    }, (err, user) => {
+
+        if (err) {
+            req.flash("danger", "Failed! Please contact administrator.");
+            res.redirect('/user/forgot-password');
+        }
+
+        if (!user) {
+            req.flash("danger", "No user found.");
+            res.redirect('/user/forgot-password');
+        }
+        if (user) {
+            const secret = process.env.SECRET_KEY + user.password;
+            const payload = {
+                email: user.email,
+                id: user.id
+            };
+            const token = jwt.sign(payload, secret, {
+                expiresIn: '1h'
+            });
+            const link = `http://localhost:4000/user/reset-password/${user.id}/${token}`
+            // Email process begins here
+            try {
+                //send mail
+                let transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.nm_user,
+                        pass: process.env.nm_pass
+                    }
+                })
+                // second step //
+                let mailOption = {
+                    from: process.env.nm_user,
+                    to: user.email,
+                    subject: 'Reset Password',
+                    text: `Dear ${user.username},\nIt seems that you forgot the password with rakify mall and requested to reset your password.\nHere is a one time usable link to reset your password and it will expire within 1 hour.\nLink: ${link}\nIf you think someone else attempt doing this, please just ignore the mail. Thank you`
+                }
+
+                // third step //
+                transporter.sendMail(mailOption, function (err, data) {
+                    if (err) {
+                        return res.json({
+                            msg: 'Can not send email',
+                            err
+                        })
+                    } else {
+                        req.flash("success", "Check your email. If you are registered, an email has been sent including further process.");
+                        res.redirect('/user/forgot-password');
+                    }
+                })
+            } catch (err) {
+                res.json({
+                    err
+                })
+            }
+        }
+    })
+});
+
+/*
+ * GET reset-password
+ */
+router.get('/reset-password/:id/:token', (req, res) => {
+    const {
+        id,
+        token
+    } = req.params;
+
+    //Check if this is id exist
+    User.findById(id, (err, user) => {
+        if (err) {
+            req.flash("danger", "Failed! Please contact administrator.");
+            res.redirect('/user/forgot-password');
+        }
+
+        if (!user) {
+            req.flash("danger", "No user found.");
+            res.redirect('/user/forgot-password');
+        }
+        if (user) {
+            const secret = process.env.SECRET_KEY + user.password;
+            try {
+                const payload = jwt.verify(token, secret);
+                res.render('user/reset_password', {
+                    email: user.email,
+                    title: "Reset Password"
+                })
+            } catch (error) {
+                req.flash("danger", "Invalid token.");
+                res.redirect('/user/forgot-password');
+            }
+        }
+    })
+});
+
+/*
+ * POST reset-password
+ */
+router.post('/reset-password/:id/:token', (req, res, next) => {
+    const {
+        id,
+        token
+    } = req.params;
+    const {
+        newPw,
+        confirmNewPw
+    } = req.body;
+
+    //Check if this id exist
+    User.findById(id, async (err, user) => {
+        if (err) {
+            req.flash("danger", "Failed! Please contact administrator.");
+            res.redirect('/user/forgot-password');
+        }
+
+        if (!user) {
+            req.flash("danger", "No user found.");
+            res.redirect('/user/forgot-password');
+        }
+        if (user) {
+            const secret = process.env.SECRET_KEY + user.password;
+
+            jwt.verify(token, secret, async (err, decoded) => {
+                if (err) res.send(err)
+                if (decoded) {
+                    // validate passwords
+                    const {
+                        error
+                    } = passwordValidation(req.body);
+                    if (error) {
+                        req.flash("danger", "Passwords did not match.");
+                        res.redirect(`/user/reset-password/${id}/${token}`);
+                    }
+                    let hash = await bcrypt.hash(newPw, 10);
+                    await User.findByIdAndUpdate(user._id, {
+                        password: hash
+                    });
+
+                    req.flash("success", "Password reset successful.");
+                    res.redirect(`/users/login`);
+                }
+            })
+        }
+    });
+});
 
 
 /*
@@ -148,7 +321,7 @@ router.post('/set-address', async (req, res) => {
         address: (req.body.address) ? req.body.address : req.user.address.address
     }
     await User.findByIdAndUpdate(req.user._id, {
-address: address
+        address: address
     }, (err, user) => {
         if (err) {
             req.flash('danger', 'Failed!');
@@ -168,8 +341,8 @@ address: address
  */
 router.post('/profile', async (req, res) => {
     let admin;
-    if(req.user.admin==0)admin = 2;
-    if(req.user.admin==2)admin = 0;
+    if (req.user.admin == 0) admin = 2;
+    if (req.user.admin == 2) admin = 0;
     await User.findByIdAndUpdate(req.user._id, {
         admin: admin
     }, (err, user) => {

@@ -23,35 +23,27 @@
 
 <!-- Pagination begins -->
 <nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-end">
-        <% if(first>1) { %>
-        <li class="page-item"><a class="page-link"
-                href="/products/shop/<%= shopname %>?page=<%= first-1 %>">Previous</a></li>
-        <% } else { %>
-        <li class="page-item disabled"><a class="page-link"
-                href="/products/shop/<%= shopname %>?page=<%= first-1 %>">Previous</a></li>
-        <% } %>
-        <% if(max>first) { %>
-        <li class="page-item"><a class="page-link"
-                href="/products/shop/<%= shopname %>?page=<%= first+1 %>"><%= first+1 %></a></li>
-        <% } %>
-        <% if(max>first+1) { %>
-        <li class="page-item"><a class="page-link"
-                href="/products/shop/<%= shopname %>?page=<%= first+2 %>"><%= first+2 %></a></li>
-        <% } %>
-        <% if(max>first+2) { %>
-        <li class="page-item"><a class="page-link"
-                href="/products/shop/<%= shopname %>?page=<%= first+3 %>"><%= first+3 %></a></li>
-        <% } %>
-        <% if(max>first) { %>
-        <li class="page-item"><a class="page-link" href="/products/shop/<%= shopname %>?page=<%= first+1 %>">Next</a>
-        </li>
-        <% } else { %>
-        <li class="page-item disabled"><a class="page-link"
-                href="/products/shop/<%= shopname %>?page=<%= first+1 %>">Next</a></li>
-        <% } %>
-    </ul>
-</nav>
-
+        <ul class="pagination justify-content-end">
+            <!-- previous link -->
+            <% if(page>1) { %>
+            <li class="page-item"><a class="page-link" href="/products/shop/<%= shopname %>?page=<%= page-1 %>">Previous</a></li>
+            <% } else { %>
+            <li class="page-item disabled"><a class="page-link" href="/products/shop/<%= shopname %>?page=<%= page-1 %>">Previous</a></li>
+            <% } %>
+            <!-- links before current page     -->
+            <% for(let i=startLink;i<=endLink;i++) { %>
+            <% if(i==page) { %>
+            <li class="page-item active"><a class="page-link" href="/products/shop/<%= shopname %>?page=<%= i %>"><%= i %></a></li>
+            <% } else { %>
+            <li class="page-item"><a class="page-link" href="/products/shop/<%= shopname %>?page=<%= i %>"><%= i %></a></li>
+            <% }} %>
+            <!-- next  link    -->
+            <% if(max>page) { %>
+            <li class="page-item"><a class="page-link" href="/products/shop/<%= shopname %>?page=<%= page+1 %>">Next</a></li>
+            <% } else { %>
+            <li class="page-item disabled"><a class="page-link" href="/products/shop/<%= shopname %>?page=<%= page+1 %>">Next</a></li>
+            <% } %>
+        </ul>
+    </nav>
 
 <%- include('_layouts/footer') %>

@@ -8,6 +8,9 @@ const {
 } = require('./validation');
 const auth = require('../config/auth')
 const isUser = auth.isUser;
+//For welcome email
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 
 // Get User Model
@@ -40,10 +43,10 @@ router.post('/register', async (req, res) => {
         email = req.body.email,
         password = req.body.password,
         hash = await bcrypt.hash(password, 10);
-        fname = req.body.fname,
+    fname = req.body.fname,
         lname = req.body.lname,
         pn = req.body.pn
-        
+
     User.create({
         username: username,
         email: email,
@@ -58,8 +61,42 @@ router.post('/register', async (req, res) => {
             res.redirect('/users/register');
         }
         if (user) {
-            req.flash('success', 'You are registered.');
-            res.redirect('/users/login');
+            // Email process begins here
+            try {
+                //send mail
+                let transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.nm_user,
+                        pass: process.env.nm_pass
+                    }
+                })
+                // second step //
+                let mailOption = {
+                    from: process.env.nm_user,
+                    to: user.email,
+                    subject: 'Welcome',
+                    text: `Dear ${user.username},/nYour email has been linked with an account to Rakify Mall. Thank you`
+                }
+
+                // third step //
+                transporter.sendMail(mailOption, function (err, data) {
+                    if (err) {
+                        return res.json({
+                            msg: 'Can not send email',
+                            err
+                        })
+                    } else {
+                        //Successful           
+                        req.flash('success', 'You are registered.');
+                        res.redirect('/users/login');
+                    }
+                })
+            } catch (err) {
+                res.json({
+                    err
+                })
+            }
         }
     })
 
