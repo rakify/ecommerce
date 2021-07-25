@@ -10,38 +10,39 @@
             <input type="hidden" name="seller" value="<%= user.username %>">
 
             <div class='mb-3'>
-                <label for='' class='form-level'>Title</label>
+                <label for='' class='form-level'>Title:</label>
                 <input type='text' class='form-control' name='title' value='<%= product.title %>' placeholder='Title'>
             </div>
 
             <div class='mb-3'>
-                <label for='' class='form-level'>Description</label>
+                <label for='' class='form-level'>Description:</label>
                 <textarea name="description" class='form-control' cols="10" rows="4"
                     placeholder="Description"><%= product.description %></textarea>
             </div>
 
             <div class='mb-3'>
-                <label for='' class='form-level'>Price</label>
+                <label for='' class='form-level'>Price:</label>
                 <input type='number' min='1' class='form-control' name='price' value='<%= product.price %>'
                     placeholder='৳'>
             </div>
 
             <input type='hidden' name="category" value="<%= product.category %>">
             <input type='hidden' name="images" value="<%= product.images %>">
+            <input type='hidden' name="image_ids" value="<%= product.image_ids %>">
 
             <div class='mb-3'>
-                <label class='form-level'>Uploaded Product Images: </label>
+                <label class='form-level'>Uploaded Product Images:</label>
                 <div class="card-header">
                 <%if (product.images.length===0){ %>
                 No pics Uploaded
                 <% } else if(product.images.length==1){ %>
-                <img src='/images/product_images/<%= product._id %>/<%= product.images[0] %>'
-                    style="display: block;margin-left: auto;margin-right: auto;" width="200" height="200">
+                <img src='<%= product.images[0] %>'
+                    style="display: block;margin-left: auto;margin-right: auto;" width="200" height="200"> <i style="padding: auto;">* Single Image can't be deleted</i> 
                 <% } else { %>
                 <% for(let i=0; i<product.images.length; i++){ %>
-                <img src='/images/product_images/<%= product._id %>/<%= product.images[i] %>'
+                <img src='<%= product.images[i] %>'
                     class="card-image-top" width="200" height="200">
-                <a class="badge badge-danger" href="/admin/products/delete-image/<%= product.images[i] %>?id=<%= product._id %>"
+                <a class="badge badge-danger" href="/admin/products/delete-image/<%= product._id %>?imgId=<%= product.image_ids[i] %>&imgLink=<%= product.images[i] %>"
                     onclick="return confirm('Are you sure?')">DELETE</a></span>
                 <% }} %>
                 <br><br>

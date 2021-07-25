@@ -10,7 +10,7 @@
     <div class="col-sm-4">
         <a class="card-link" href="/products/<%= product.category %>/<%= product.slug %>">
             <img class="card-img-top" style="width: 10rem; height: 10rem;"
-                src="/images/product_images/<%= product._id %>/<%= product.images[0] %>" alt="">
+                src="<%= product.images[0] %>" alt="">
         </a>
         <div class="card-body">
             <span class="h6"><%= product.title %></span> <span class="badge badge-info">৳ <%= product.price %></span><br>

@@ -32,6 +32,13 @@ const ProductSchema = mongoose.Schema({
     images: {
         type: Array,
         max: 5,
+        min: 1,
+        required: true
+    },
+    image_ids: {
+        type: Array,
+        max: 5,
+        min: 1,
         required: true
     }
 }, {

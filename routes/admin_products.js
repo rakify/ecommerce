@@ -1,11 +1,19 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const fs = require('fs-extra');
 const path = require('path');
 const multer = require('multer');
 const auth = require('../config/auth')
-const isAdmin = auth.isAdmin;
 const isSellerAdmin = auth.isSellerAdmin;
+const cloudinary = require('cloudinary').v2;
+cloudinary.config({
+    cloud_name: process.env.cloud_name,
+    api_key: process.env.api_key,
+    api_secret: process.env.api_secret
+});
+
+
 
 //get productValidation
 const {
@@ -19,11 +27,10 @@ const Category = require('../models/Category');
 
 //preparing multer for image upload
 const imageStorage = multer.diskStorage({
-    // Destination to store temporary image     
-    destination: 'public/images/product_images/tmp',
+    //destination: 'public/images/product_images/tmp',
     filename: (_req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname))
-        // path.extname get the uploaded file extension
+        // path.extname gets the uploaded file extension
     }
 });
 
@@ -52,9 +59,9 @@ router.get('/', isSellerAdmin, (req, res) => {
             count: products.length,
             user: user,
             title: "Products Control Panel"
-        }); //res.render ends
-    }); //Product.find ends
-}); //router.get ends
+        });
+    });
+});
 
 /*
  * GET add product
@@ -82,21 +89,14 @@ router.get('/add-product', isSellerAdmin, async (req, res) => {
             categories: categories,
             user: user,
             title: "Products Control Panel"
-        }); //res.render ends
-    }); //Category.find ends
-}); //router.get ends
+        });
+    });
+});
 
 /*
  * POST add product
  */
-router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
-    let images = [];
-    if (req.files !== undefined) {
-        for (let i = 0; i < req.files.length; i++) {
-            images.push(req.files[i].filename)
-        };
-    }
-
+router.post('/add-product', imageUpload.array('images', 5), async (req, res) => {
     let seller = req.body.seller,
         title = req.body.title,
         slug = title.replace(/\s+/g, '-').toLowerCase(),
@@ -111,7 +111,8 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
         description: description,
         category: category,
         price: price,
-        images: images
+        images: req.files,
+        image_ids: req.files //cloudinary public id per images, will get real value later
     }
     const {
         error
@@ -124,20 +125,32 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
                 categories: categories,
                 user: user,
                 title: "Products Control Panel"
-            }); //res.render ends
-        }); //Category.find ends
-    } //if ends
+            });
+        });
+    }
+
+    // Uploading the files to cloudinary
+    let images = [],
+        image_ids = [];
+    try {
+        for (let i = 0; i < req.files.length; i++) {
+            let result = await cloudinary.uploader.upload(req.files[i].path, {
+                folder: `${user.username}/${category}/${slug}`
+            })
+            images.push(result.secure_url);
+            image_ids.push(result.public_id)
+        }
+    } catch (err) {
+        res.send(err);
+    }
+
+    newProduct.images = images;
+    newProduct.image_ids = image_ids;
     Product.create(newProduct, (err, product) => {
         if (product) {
-            images.forEach((image) => {
-                fs.move(`public/images/product_images/tmp/${image}`,
-                `public/images/product_images/${product._id}/${image}`, (err) => {
-                    if (err) console.log('error req.files on post add-product');
-                });
-            });
             req.flash('success', 'Product added');
             res.redirect('/admin/products');
-        }; //if ends
+        }
         if (err) {
             return Category.find((_err, categories) => { //err not gonna happen here for sure
                 res.render('admin/add_product', {
@@ -146,19 +159,17 @@ router.post('/add-product', imageUpload.array('images', 5), (req, res) => {
                     categories: categories,
                     user: user,
                     title: "Products Control Panel"
-                }); //res.render ends
-            }); //Category.find ends
-        }; //if ends
-    }); //Product.create ends
-}); //router.post ends
+                });
+            });
+        };
+    });
+});
 
 /*
  * GET edit product
  */
 router.get('/edit-product/:id', isSellerAdmin, async (req, res) => {
-
     /* 
-   
     >> Since this path requires the product id and the id is visible to all users shopping here so any registered
     user can easily edit the product by making a link by themself.
     I am making sure whoever trying to access the link is
@@ -166,9 +177,8 @@ router.get('/edit-product/:id', isSellerAdmin, async (req, res) => {
     2. The real owner of the product.
     To anyone else send status code 403 (Forbidden)
 
-    >> Now what if user is trying to edit a product that is linked incorrectly or not available!
+    >> What if user is trying to edit a product that is linked incorrectly or not available!
     Send status code 404 (Not found)
-    
     */
 
     await Product.findById(req.params.id, (err, product) => {
@@ -218,23 +228,23 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         price = req.body.price,
         id = req.params.id,
         images = req.body.images.split(','),
-        oldImages = images,
+        oldImages = images;
+    image_ids = req.body.image_ids.split(','),
         overSizedImageArray = [1, 2, 3, 4, 5, 6],
         user = req.user;
     if (req.files !== undefined && images.length + req.files.length < 6) {
-        req.files.forEach(image => {
-            fs.move(`public/images/product_images/tmp/${image.filename}`,
-                `public/images/product_images/${req.params.id}/${image.filename}`, (err) => {
-                    if (err) console.log('err at moving at post edit product');
-                });
-        })
-        let filenames = req.files.map((file) => file.filename);
-        images.push(...filenames);
+        // Uploading the files to cloudinary
+        for (let i = 0; i < req.files.length; i++) {
+            let result = await cloudinary.uploader.upload(req.files[i].path, {
+                folder: `${seller}/${category}/${slug}`
+            });
+            images.push(result.secure_url);
+            image_ids.push(result.public_id)
+        }
+        //if theres some other error image uploading also should be affected
+        //oldImages = images;
     } else {
-        images = overSizedImageArray; //pass this oversized array in newProduct
-        fs.emptyDir('public/images/product_images/tmp', (err) => {
-            if (err) console.log('couldnt empty tmp dir at edit product')
-        })
+        images = overSizedImageArray; //pass this oversized array in newProduct just to inform what happened
     }
     let newProduct = {
         seller: seller,
@@ -244,21 +254,15 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
         category: category,
         price: price,
         images: images,
+        image_ids: image_ids,
         _id: id
     };
     const {
         error
     } = productValidation(newProduct);
     if (error) {
-        newProduct.images = oldImages;
-
-        /*
-        
-        if validation process fails, return oldImages to the images array and everything else
-        will be the same as user previously input.
-        
-        */
-
+        //Error should stop uploading images
+        newProduct.images = oldImages; //
         return res.render('admin/edit_product', {
             error: error.details[0].message,
             product: newProduct,
@@ -292,7 +296,6 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
  * GET delete product
  */
 router.get('/delete-product/:id', isSellerAdmin, async (req, res) => {
-
     /*
 
     >> If the link with provided id is not found return send status code 404 (not found)
@@ -307,16 +310,17 @@ router.get('/delete-product/:id', isSellerAdmin, async (req, res) => {
             return res.sendStatus(404);
         }
         if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") {
-            await Product.findByIdAndDelete(req.params.id, (err, product) => {
+            await Product.findByIdAndDelete(req.params.id, async (err, product) => {
                 if (err) {
                     req.flash('danger', 'Deletion failed.');
                     res.redirect('/admin/products/');
                 }
                 if (product) {
-                    //also delete the folder containing pic
-                    fs.remove(`public/images/product_images/${product._id}`, (err) => {
-                        if (err) console.log(err)
-                    });
+                    //also delete pics from cloudinary
+                    //first empty the folder
+                    //then delete the empty folder
+                    await cloudinary.api.delete_resources_by_prefix(`${product.seller}/${product.category}/${product.slug}`);
+                    await cloudinary.api.delete_folder(`${product.seller}/${product.category}/${product.slug}`);
                     req.flash('success', 'Product deleted.');
                     res.redirect('/admin/products/');
                 };
@@ -329,38 +333,37 @@ router.get('/delete-product/:id', isSellerAdmin, async (req, res) => {
 /*
  * GET delete image
  */
-router.get('/delete-image/:image', isSellerAdmin, (req, res) => {
+router.get('/delete-image/:id', isSellerAdmin, (req, res) => {
     /*
     
     ?? Anyone with the image name and product id can delete the image.
     >> Fixed it.
     
     */
-    let id = req.query.id,
-        image = req.params.image;
-    Product.findById(id, (err, product) => {
-        if (err) {
-            return res.sendStatus(404);
-        }
-        if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") {
-            fs.remove(`public/images/product_images/${id}/${image}`, async err => {
-                if (err) return res.sendStatus(404);
+    let id = req.params.id,
+        imgLink = req.query.imgLink,
+        imgId = req.query.imgId
+    try {
+        Product.findById(id, async (err, product) => {
+            if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") {
+                //delete the image using image_ids (single)
+                await cloudinary.uploader.destroy(imgId);
+                //remove image url from images and image_ids from image_ids
                 await Product.findByIdAndUpdate(id, {
                     $pull: {
-                        images: image
+                        images: imgLink,
+                        image_ids: imgId
                     }
-                }, (err, product) => {
-                    if (product) {
-                        req.flash('success', 'Image deleted.');
-                        res.redirect(`/admin/products/edit-product/${req.query.id}`)
-                    }
-                    if (err) return res.sendStatus(404);
-                }); //Product.findByIdAndUpdate ends
-            }); //fs.remove ends
-        } else return res.sendStatus(403);
-    })
-}); //get router delete image ends
+                })
+                req.flash('success', 'Image deleted.');
+                res.redirect(`/admin/products/edit-product/${id}`)
+            }
+        })
+    } catch (err) {
+        res.sendStatus(403)
+    }
 
+});
 
 
 

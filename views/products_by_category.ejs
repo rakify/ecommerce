@@ -9,7 +9,7 @@
     <% products.forEach((product)=>{ %>
     <div class="col-xs-12 col-md-4">
         <a class="pa" href="/products/<%= product.category %>/<%= product.slug %>">
-            <img class="pimage" src="/images/product_images/<%= product._id %>/<%= product.images[0] %>" alt="">
+            <img class="pimage" src="<%= product.images[0] %>" alt="">
         </a>
         <div class="card-body">
             <span class="h6"><%= product.title %></span> <span class="badge badge-success">৳

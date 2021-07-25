@@ -54,6 +54,7 @@ const productValidation = (data) => {
             .max(5)
             .min(1)
             .required(),
+        image_ids: Joi.array(),
         _id: Joi.string()
     });
     return schema.validate(data);
