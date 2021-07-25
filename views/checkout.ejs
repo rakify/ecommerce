@@ -16,7 +16,7 @@
     <% let subtotal = product.quantity * product.price %>
     <% total+=subtotal; %>
     <tr>
-        <td><img class="cpi" src="<%= product.image %>" alt=""></td>
+        <td><img class="cpi" src="<%= product.images[0] %>" alt=""></td>
         <td><%= product.title %></td>
         <td>৳<%= product.price %></td>
         <td><%= product.quantity %></td>
