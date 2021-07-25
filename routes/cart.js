@@ -23,7 +23,7 @@ router.get('/add/:product', (req, res) => {
                     slug: slug,
                     quantity: 1,
                     price: product.price,
-                    image: `/images/product_images/${product._id}/${product.images[0]}`
+                    image: `${product.images[0]}`
                 });
             } else {
                 let cart = req.session.cart;
@@ -42,7 +42,7 @@ router.get('/add/:product', (req, res) => {
                         slug: slug,
                         quantity: 1,
                         price: product.price,
-                        image: `/images/product_images/${product._id}/${product.images[0]}`
+                        image: `${product.images[0]}`
                     });
                 }
             }
