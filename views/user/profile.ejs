@@ -26,7 +26,7 @@
         <p class="card-text text-center"><%= (user.address[0].district)? user.address[0].district : "N/A" %></p>
         <b class="card-title" style="display: inline; float: left;">Full Address: </b>
         <p class="card-text text-center"><%= (user.address[0].address)? user.address[0].address : "N/A" %></p>
-    <% } else { %>
+        <% } else { %>
         You have not set your delivery address yet.
         <% } %>
     </div>
@@ -49,19 +49,15 @@
     <div class="card-body">
         <ul class="list-group">
             <li style="list-style-type: circle;">
-                <a href="/user/change-password">Change Password</a>
+                <a style="color:#c00" href="/user/change-password">Change Password</a>
             </li>
             <li style="list-style-type: circle;">
                 <form action="" method="post">
                     <input type="submit" style="background: none!important;
-                        border: none;
-                        padding: 0!important;
-                        /*optional*/
-                        font-family: arial, sans-serif;
-                        /*input has OS specific font-family*/
-                        color: #0d6efd;
-                        text-decoration: underline;
-                        cursor: pointer;" value="<%= (user.admin==0)? "Be Seller" : "Be Buyer" %>">
+                    border: none;
+                    padding: 0!important;
+                    color: #c00; 
+                    cursor: pointer;" value="<%= (user.admin==0)? "Be Seller" : "Be Buyer" %>">
                 </form>
             </li>
         </ul>
