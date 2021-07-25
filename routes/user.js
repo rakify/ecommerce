@@ -74,10 +74,7 @@ router.post('/forgot-password', (req, res, next) => {
                     from: process.env.nm_user,
                     to: user.email,
                     subject: 'Reset Password',
-                    text: `Dear ${user.username},\nIt seems that you forgot the password with rakify mall and requested
-                    to reset your password.\nHere is a one time usable link to reset your password and it will expire
-                    within 1 hour.\nLink: ${link}\nIf you think someone else attempt doing this, please just ignore the
-                    mail. Thank you`
+                    text: `Dear ${user.username},\nIt seems that you forgot the password with rakify mall and requested to reset your password.\nHere is a one time usable link to reset your password and it will expire within 1 hour.\nLink: ${link}\nIf you think someone else attempt doing this, please just ignore the mail. Thank you`
                 }
 
                 // third step //
