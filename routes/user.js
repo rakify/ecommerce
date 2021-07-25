@@ -58,7 +58,7 @@ router.post('/forgot-password', (req, res, next) => {
             const token = jwt.sign(payload, secret, {
                 expiresIn: '1h'
             });
-            const link = `http://localhost:4000/user/reset-password/${user.id}/${token}`
+            const link = `http://rakify.herokuapp.com/user/reset-password/${user.id}/${token}`
             // Email process begins here
             try {
                 //send mail
@@ -74,7 +74,10 @@ router.post('/forgot-password', (req, res, next) => {
                     from: process.env.nm_user,
                     to: user.email,
                     subject: 'Reset Password',
-                    text: `Dear ${user.username},\nIt seems that you forgot the password with rakify mall and requested to reset your password.\nHere is a one time usable link to reset your password and it will expire within 1 hour.\nLink: ${link}\nIf you think someone else attempt doing this, please just ignore the mail. Thank you`
+                    text: `Dear ${user.username},\nIt seems that you forgot the password with rakify mall and requested
+                    to reset your password.\nHere is a one time usable link to reset your password and it will expire
+                    within 1 hour.\nLink: ${link}\nIf you think someone else attempt doing this, please just ignore the
+                    mail. Thank you`
                 }
 
                 // third step //
