@@ -1,5 +1,8 @@
+<% if(user.admin == 1) { %>
 <%- include('../_layouts/adminheader') %>
-
+<% } else { %> 
+    <%- include('../_layouts/sellerheader') %>
+<% } %> 
 <div class="card" style="width: 70rem;">
   <div class="card-body">
     <h5 class="card-title">Products by <%= user.username %></h5>
@@ -50,6 +53,32 @@
 <% } %>
   </div>
 </div>
+
+<!-- Pagination begins -->
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-end">
+        <!-- previous link -->
+        <% if(page>1) { %>
+        <li class="page-item"><a class="page-link" href="/admin/products?page=<%= page-1 %>">Previous</a></li>
+        <% } else { %>
+        <li class="page-item disabled"><a class="page-link" href="/admin/products?page=<%= page-1 %>">Previous</a></li>
+        <% } %>
+        <!-- links before current page     -->
+        <% for(let i=startLink;i<=endLink;i++) { %>
+        <% if(i==page) { %>
+        <li class="page-item active"><a class="page-link" href="/admin/products?page=<%= i %>"><%= i %></a></li>
+        <% } else { %>
+        <li class="page-item"><a class="page-link" href="/admin/products?page=<%= i %>"><%= i %></a></li>
+        <% }} %>
+        <!-- next  link    -->
+        <% if(max>page) { %>
+        <li class="page-item"><a class="page-link" href="/admin/products?page=<%= page+1 %>">Next</a></li>
+        <% } else { %>
+        <li class="page-item disabled"><a class="page-link" href="/admin/products?page=<%= page+1 %>">Next</a></li>
+        <% } %>
+    </ul>
+</nav>
+
 
 
 <%- include('../_layouts/adminfooter') %>

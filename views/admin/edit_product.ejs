@@ -1,5 +1,8 @@
-<%- include('../_layouts/adminheader') %>
-
+<% if(user.admin == 1) { %>
+    <%- include('../_layouts/adminheader') %>
+    <% } else { %> 
+        <%- include('../_layouts/sellerheader') %>
+    <% } %> 
 <div class="card" style="width: 70rem;">
     <div class="card-body">
         <h2 class="card-title"><%= title %></h2>

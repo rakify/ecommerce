@@ -23,8 +23,8 @@
             <% if(product.images.length>1) {%>
             <% product.images.slice(1).forEach((image)=>{ %>
             <li>
-                <a data-fancybox="gallery" href="/images/product_images/<%= product._id %>/<%= image %>"><img
-                        class="pimage" src="/images/product_images/<%= product._id %>/<%= image %>" alt=""></a>
+                <a data-fancybox="gallery" href="<%= image %>"><img
+                        class="pimage" src="<%= image %>" alt="Product_images"></a>
             </li>
             <% })} else { %>
             <br>

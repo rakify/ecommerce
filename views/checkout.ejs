@@ -34,9 +34,19 @@
     <tr>
         <td colspan="5" align="right"><a href="/cart/clear" class="btn btn-danger"
                 onclick="return confirm('Sure clear cart?')">Clear Cart</a></td>
-        <td colspan="5" align="right"><a href="#" class="btn btn-primary buynow">Buy now</a></td>
+        <td colpan="5" align="right">
+            <% if(user.address.length>0) { %>
+            <a href="#" class="btn btn-primary buynow">Buy now</a>
+            <% } else { %>
+            <button type="button" class="btn btn-primary" disabled>Buy Now</button>
+            <% } %>
+        </td>
     </tr>
 </table>
+<% if(user.address.length===0) { %>
+    <p style="color: red;">* You must <a href="/user/set-address">set delivery address</a> before you can
+        purchase.</p>
+    <% } %>
 <!-- Paypal checkout process starts -->
 <form class="pp" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
     <input type="hidden" name="cmd" value="_cart">

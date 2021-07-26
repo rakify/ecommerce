@@ -7,6 +7,7 @@ let Product = require('../models/Product');
 // Get Category Model
 let Category = require('../models/Category');
 
+
 /*
  * GET all products
  */

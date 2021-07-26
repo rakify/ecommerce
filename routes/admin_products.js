@@ -51,16 +51,49 @@ const imageUpload = multer({
 /*
  * GET products index
  */
-router.get('/', isSellerAdmin, (req, res) => {
+router.get('/', isSellerAdmin, async(req, res) => {
+    //Pagination starts
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const count = await Product.countDocuments().exec();
+    const max = Math.ceil(count / limit) || 1; //maximum pages available if no pages available set it to 1
+
+    // In case someone asks for a page(>0) that doesnt exist redirect him to the last page
+    if (page > max) {
+        res.redirect(`/admin/products/?page=${max}`)
+    }
+    // In case someone asks for a page(<1) that doesnt exist redirect him to the first page
+    if (page < 1) {
+        res.redirect(`/admin/products/?page=1`)
+    }
+
+    let startLink, endLink;
+    // Before the actual page, let it have at most 3 links
+    if (page - 3 >= 1) startLink = page - 3;
+    else if (page - 2 >= 1) startLink = page - 2;
+    else if (page - 1 >= 1) startLink = page - 1;
+    else startLink = page;
+    // After the actual page, let it have at most 3 links
+    if (page + 3 <= max) endLink = page + 3;
+    else if (page + 2 <= max) endLink = page + 2;
+    else if (page + 1 <= max) endLink = page + 1;
+    else endLink = page;
+
     let user = req.user;
     Product.find((_err, products) => { //if no product available rendered file will handle the err
         res.render('admin/products', {
             products: products,
             count: products.length,
             user: user,
-            title: "Products Control Panel"
+            max: max,
+            page: page,
+            startLink: startLink,
+            endLink: endLink,
+            title: `Products CPanel - ${user.username}`
         });
-    });
+    }).sort({
+        createdAt: -1
+    }).limit(limit * 1).skip((page - 1) * limit);
 });
 
 /*
@@ -81,14 +114,14 @@ router.get('/add-product', isSellerAdmin, async (req, res) => {
                 product: newProduct,
                 categories: [],
                 user: user,
-                title: "Products Control Panel"
+                title: `Add Product - ${user.username}`
             });
         }
         res.render('admin/add_product', {
             product: newProduct,
             categories: categories,
             user: user,
-            title: "Products Control Panel"
+            title: `Add Product - ${user.username}`
         });
     });
 });
@@ -124,7 +157,7 @@ router.post('/add-product', imageUpload.array('images', 5), async (req, res) => 
                 product: newProduct,
                 categories: categories,
                 user: user,
-                title: "Products Control Panel"
+                title: `Add Product - ${user.username}`
             });
         });
     }
@@ -158,7 +191,7 @@ router.post('/add-product', imageUpload.array('images', 5), async (req, res) => 
                     product: newProduct,
                     categories: categories,
                     user: user,
-                    title: "Products Control Panel"
+                    title: `Add Product - ${user.username}`
                 });
             });
         };
@@ -169,6 +202,7 @@ router.post('/add-product', imageUpload.array('images', 5), async (req, res) => 
  * GET edit product
  */
 router.get('/edit-product/:id', isSellerAdmin, async (req, res) => {
+    let user = req.user;
     /* 
     >> Since this path requires the product id and the id is visible to all users shopping here so any registered
     user can easily edit the product by making a link by themself.
@@ -186,8 +220,8 @@ router.get('/edit-product/:id', isSellerAdmin, async (req, res) => {
         if (req.user.username == product.seller || req.user._id == "60e7166e31b12f23187f4b68") {
             return res.render('admin/edit_product', {
                 product: product,
-                user: req.user,
-                title: "Edit a Product"
+                user: user,
+                title: `Edit Product - ${user.username}`
             });
         } else return res.sendStatus(403);
     });
@@ -267,7 +301,7 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
             error: error.details[0].message,
             product: newProduct,
             user: user,
-            title: "Products Control Panel"
+            title: `Edit Product - ${user.username}`
         });
     };
 
@@ -284,7 +318,7 @@ router.post('/edit-product/:id', imageUpload.array('newImages', 5), async (req, 
 
                 product: newProduct,
                 user: user,
-                title: "Products Control Panel"
+                title: `Edit Product - ${user.username}`
             });
         };
         req.flash('success', 'Product updated.');

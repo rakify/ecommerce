@@ -69,7 +69,6 @@ router.post('/forgot-password', (req, res, next) => {
                         pass: process.env.nm_pass
                     }
                 })
-                // second step //
                 let mailOption = {
                     from: process.env.nm_user,
                     to: user.email,
@@ -77,7 +76,6 @@ router.post('/forgot-password', (req, res, next) => {
                     text: `Dear ${user.username},\nIt seems that you forgot the password with rakify mall and requested to reset your password.\nHere is a one time usable link to reset your password and it will expire within 1 hour.\nLink: ${link}\nIf you think someone else attempt doing this, please just ignore the mail. Thank you`
                 }
 
-                // third step //
                 transporter.sendMail(mailOption, function (err, data) {
                     if (err) {
                         return res.json({
