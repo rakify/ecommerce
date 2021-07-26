@@ -133,7 +133,7 @@ router.post('/login', function (req, res, next) {
  * GET logout
  */
 router.get('/logout', function (req, res) {
-
+    delete req.session.cart;
     req.logout();
 
     req.flash('success', 'You are logged out!');
