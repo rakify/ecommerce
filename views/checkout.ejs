@@ -43,9 +43,9 @@
         </td>
     </tr>
 </table>
-<% if(user.address.length===0) { %>
-    <p style="color: red;">* You must <a href="/user/set-address">set delivery address</a> before you can
-        purchase.</p>
+<% if(user.address.length===0 || !user.pn) { %>
+    <p style="color: red;">* You must set a valid <a href="/user/edit-profile">phone number</a> & <a href="/user/set-address"> delivery address</a>
+        before you can purchase.</p>
     <% } %>
 <!-- Paypal checkout process starts -->
 <form class="pp" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
