@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const fs = require('fs-extra');
 const path = require('path');
 const multer = require('multer');
 const auth = require('../config/auth')

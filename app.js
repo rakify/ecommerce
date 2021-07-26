@@ -3,15 +3,6 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const passport = require('passport');
 require('dotenv').config();
-const cloudinary = require('cloudinary').v2;
-
-cloudinary.config({ 
-  cloud_name: 'rakibs', 
-  api_key: '359778781159941', 
-  api_secret: 'Zff48bRkbiDhHx2cMhxvo4q62a4',
-  secure: true
-});
-
 
 //connect to db
 mongoose.connect(process.env.DB_CONNECTION, {

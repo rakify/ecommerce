@@ -20,8 +20,8 @@
     <% })} %>
 </div>
 
-
 <!-- Pagination begins -->
+<% if(page>1) { %> 
 <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-end">
             <!-- previous link -->
@@ -45,5 +45,5 @@
             <% } %>
         </ul>
     </nav>
-
+<% } %> 
 <%- include('_layouts/footer') %>
