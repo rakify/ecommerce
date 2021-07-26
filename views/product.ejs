@@ -9,6 +9,7 @@
         <p><b>Description: </b><%= product.description %></p>
         <p><b>Price: </b>৳<%= product.price %></p>
         <p><b>Seller: </b><a class="card-link" href="/products/shop/<%= product.seller %>"><%= product.seller %></a></p>
+        <p><b>Category: </b><a class="card-link" href="/products/<%= product.category %>"><%= product.category.toUpperCase() %></a></p>
         <% if (loggedIn) { %>
         <p><a class="btn btn-primary btn-lg btn-block" href="/cart/add/<%= product.slug %>">Add to cart</a></p>
         <% } else { %>
